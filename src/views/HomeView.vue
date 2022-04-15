@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: "HomeView",
+  name: "home-view",
   data() {
     return {
       v1: "",

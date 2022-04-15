@@ -13,6 +13,7 @@ import LoginFormVue from "@/components/LoginForm.vue";
 import { mapGetters } from "vuex";
 import LogOutVue from "../components/LogOut.vue";
 export default {
+  name: "login-view",
   components: {
     "login-form": LoginFormVue,
     "log-out": LogOutVue,

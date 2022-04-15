@@ -46,7 +46,7 @@ export default {
       // logout function
       logOut: () => {
         logOut();
-        router.push("/login");
+        router.push("/");
       },
       // menu items
       menuItems: computed(() => {

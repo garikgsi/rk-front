@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-banner inline-actions class="text-white" :class="classes">
+    <q-banner inline-actions class="text-white" :class="classes" v-if="isShow">
       {{ msg.message }}
       <template v-slot:action>
         <q-btn flat color="white" label="OK" @click="setRead({ id: msg.id })" />
@@ -24,9 +24,17 @@ export default {
       default: 5,
     },
   },
-  created() {
-    if (this.msg.type != "error") {
+  data() {
+    return {
+      isShow: true,
+    };
+  },
+  mounted() {
+    {
       setTimeout(() => {
+        if (this.msg.type != "error") {
+          this.isShow = false;
+        }
         this.setRead({ id: this.msg.id });
       }, this.timeout * 1000);
     }

@@ -6,6 +6,7 @@ import { Quasar } from "quasar";
 import quasarUserOptions from "./quasar-user-options";
 
 import directives from "@/directives/index";
+import AppPageVue from "./views/AppSkeleton/AppPage.vue";
 
 const app = createApp(App)
   .use(Quasar, quasarUserOptions)
@@ -15,5 +16,7 @@ const app = createApp(App)
 directives.forEach((directive) => {
   app.directive(directive.name, directive);
 });
+
+app.component("app-page", AppPageVue);
 
 app.mount("#app");

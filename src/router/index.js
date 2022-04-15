@@ -3,12 +3,14 @@ import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView";
 import TokensView from "@/views/TokensView";
 import store from "@/store";
+import DashboardVue from "@/views/Dashboard.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: HomeView,
+    meta: { noAuth: true },
   },
   {
     path: "/login",
@@ -19,7 +21,7 @@ const routes = [
   {
     path: "/dashboard",
     name: "dashboard",
-    component: HomeView,
+    component: DashboardVue,
   },
   {
     path: "/tokens",

@@ -8,7 +8,6 @@ import {
   storageRemove,
   storageGet,
 } from "./localStorage";
-import { platformName } from "./platform";
 
 // logout from app
 const logOut = () => {
@@ -22,12 +21,13 @@ const logIn = async ({ email, password, saveLogged }) => {
   let requestData = new FormData();
   requestData.append("email", email);
   requestData.append("password", password);
-  requestData.append("device_name", platformName());
+  requestData.append("device_name", "siteAuth");
 
   const response = await post({
     url: "auth/token",
     data: requestData,
   });
+
   const { data, isError, error } = response;
   if (isError) {
     addError(error);
@@ -57,6 +57,8 @@ const checkStoredUser = async () => {
       storageRemove("user");
       return false;
     }
+  } else {
+    return false;
   }
 };
 

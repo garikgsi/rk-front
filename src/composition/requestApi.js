@@ -11,11 +11,12 @@ const removeToken = () =>
   (axios.defaults.headers.common["Authorization"] = null);
 
 // basic request
-const request = async ({ method, url, data, token = null }) => {
+const request = async ({ method, url, data, params = {}, token = null }) => {
   const axiosCfg = {
     url: `${apiUrl}/${url}`,
     method,
     data,
+    params,
     timeout: 3000,
     headers: {
       post: {
@@ -26,13 +27,18 @@ const request = async ({ method, url, data, token = null }) => {
   if (token) axiosCfg.headers.Authorization = "Bearer " + token;
 
   let result = {
+    data: undefined,
     error: "Check internet connection",
+    count: 0,
   };
   try {
-    const { data, status } = await axios.request(axiosCfg);
+    const response = await axios.request(axiosCfg);
+
+    const status = response.status;
+    const { data, error, isError, count } = response.data;
     result = {
       ...result,
-      ...{ data, error: null, isError: false, code: status },
+      ...{ data, error, isError, code: status, count },
     };
   } catch (error) {
     result = {
@@ -40,20 +46,19 @@ const request = async ({ method, url, data, token = null }) => {
       ...{
         isError: true,
         code: error?.response?.status,
-        error: error?.response?.data
-          ? error.response.data
+        error: error?.response?.data?.error
+          ? error.response.data?.error
           : "Check internet connection",
       },
     };
-
-    result.error = error;
   }
   return result;
 };
 
 // get request
-const get = ({ url, token = null }) => {
-  return request({ method: "get", url, token });
+const get = ({ url, params = {}, token = null }) => {
+  const response = request({ method: "get", url, token, params });
+  return response;
 };
 
 // post request

@@ -1,16 +1,10 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-primary text-white" height-hint="98">
-      <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
-
-        <q-toolbar-title> SMS Application </q-toolbar-title>
-      </q-toolbar>
-
-      <q-tabs v-if="isAuth" align="left">
-        <q-route-tab to="/login" label="Login" :disable="isAuth" />
-        <q-route-tab to="/dashboard" label="Home" />
-      </q-tabs>
+      <app-header
+        @toggleLeftDrawer="toggleLeftDrawer"
+        :menu-items="headerMenu"
+      ></app-header>
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" side="left" overlay elevated>
@@ -23,23 +17,25 @@
 
     <app-banner v-if="lastMessage" :msg="lastMessage"></app-banner>
 
-    <q-footer elevated class="bg-grey-8 text-white">
-      <q-toolbar>
-        <q-toolbar-title>
-          <div>Title</div>
-        </q-toolbar-title>
-      </q-toolbar>
+    <q-footer bordered class="bg-white text-primary">
+      <q-tabs class="text-primary">
+        <q-tab name="about" icon="info" label="About" />
+        <q-tab name="sms" icon="sms" label="SMS" />
+        <q-tab name="contacts" icon="contacts" label="Contacts" />
+        <q-tab name="faq" icon="help" label="FAQ" />
+      </q-tabs>
     </q-footer>
   </q-layout>
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { mapGetters, useStore } from "vuex";
+import { useRouter } from "vue-router";
 import AppBanner from "@/components/UI/AppBanner.vue";
 import AppSideBar from "@/views/AppSkeleton/SideBar.vue";
-import { useRouter } from "vue-router";
 import { checkStoredUser } from "@/composition/appAuth";
+import AppHeader from "@/views/AppSkeleton/AppHeader.vue";
 
 export default {
   setup() {
@@ -48,8 +44,8 @@ export default {
     const router = useRouter();
     const store = useStore();
 
-    checkStoredUser().then(() => {
-      router.push("/dashboard");
+    checkStoredUser().then((isAuth) => {
+      router.push(isAuth ? "/dashboard" : "/");
     });
 
     return {
@@ -67,13 +63,17 @@ export default {
   components: {
     "app-banner": AppBanner,
     "app-sidebar": AppSideBar,
+    "app-header": AppHeader,
   },
   computed: {
     ...mapGetters({
       isAuth: "user/isAuth",
     }),
     sideBarMenu() {
-      return [{ to: "tokens", title: "My tokens", icon: "api" }];
+      return [{ to: { name: "tokens" }, title: "My tokens", icon: "api" }];
+    },
+    headerMenu() {
+      return [{ to: { name: "dashboard" }, title: "Dashboard" }];
     },
   },
 };

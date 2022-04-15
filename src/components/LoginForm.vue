@@ -51,7 +51,7 @@ export default {
         email: login.value,
         password: password.value,
         saveLogged: saveLogged.value,
-      }).then(() => router.push("/"));
+      }).then(() => router.push("/dashboard"));
     };
 
     return {

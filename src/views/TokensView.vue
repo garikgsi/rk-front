@@ -1,11 +1,21 @@
 <template>
-  <div>
-    <h1>My tokens</h1>
-  </div>
+  <app-page
+    title="My tokens"
+    icon="api"
+    sub-title="here you can add new or revoke existed tokens"
+  >
+    <token-list></token-list>
+  </app-page>
 </template>
 
 <script>
-export default {};
+import TokenListVue from "@/components/tokens/TokenList.vue";
+export default {
+  name: "token-view",
+  components: {
+    "token-list": TokenListVue,
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>
