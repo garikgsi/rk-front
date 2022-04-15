@@ -18,7 +18,7 @@
     <app-banner v-if="lastMessage" :msg="lastMessage"></app-banner>
 
     <q-footer bordered class="bg-white text-primary">
-      <q-tabs class="text-primary">
+      <q-tabs class="text-primary" align="justify">
         <q-tab name="about" icon="info" label="About" />
         <q-tab name="sms" icon="sms" label="SMS" />
         <q-tab name="contacts" icon="contacts" label="Contacts" />

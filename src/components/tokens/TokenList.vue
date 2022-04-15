@@ -31,29 +31,12 @@ export default {
     const columns = ref([
       { name: "name", field: "name", label: "Device name", sortable: false },
       {
-        name: "abilities",
-        field: "abilities",
-        label: "Permissions",
-        sortable: false,
-      },
-      {
         name: "created_at",
         field: "created_at",
         label: "Create date",
         sortable: false,
       },
     ]);
-
-    // const getTokens = async () => {
-    //   loading.value = true;
-    //   const response = await fetchTokens({
-    //     page: pagination.value.page,
-    //     limit: pagination.value.rowsPerPage,
-    //   });
-    //   loading.value = false;
-    //   tokens.value = response.data;
-    //   pagination.value.rowsNumber = response.count;
-    // };
 
     const getTokens = async (props) => {
       // console.log(props);
@@ -85,7 +68,6 @@ export default {
           return {
             name: token.name,
             id: token.id,
-            abilities: token.abilities,
             created_at: token.created_at,
           };
         })
