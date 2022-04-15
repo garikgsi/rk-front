@@ -7,27 +7,35 @@
       no-data-label="There is no any tokens"
       v-model:pagination="pagination"
       :loading="loading"
-      @request="getTokens"
+      @request="getData"
       :binary-state-sort="true"
-    ></q-table>
+    >
+      <template v-slot:top>
+        <q-toolbar class="bg-primary text-white" align="right">
+          <q-btn flat @click="addToken">Create new token</q-btn>
+        </q-toolbar>
+      </template>
+
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props">
+          <q-btn
+            icon="delete_outline"
+            flat
+            @click="revokeToken(props.row.id)"
+          ></q-btn>
+        </q-td>
+      </template>
+    </q-table>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
-import { fetchTokens } from "@/composition/tokens/fetchTokens";
+import { ref } from "vue";
+import fetchTokens from "@/composition/tokens/fetchTokens";
+
 export default {
   name: "token-list",
   setup() {
-    const tokens = ref([]);
-    let loading = ref(false);
-    const pagination = ref({
-      sortBy: "name",
-      descending: false,
-      page: 1,
-      rowsPerPage: 5,
-      rowsNumber: 0,
-    });
     const columns = ref([
       { name: "name", field: "name", label: "Device name", sortable: false },
       {
@@ -36,42 +44,18 @@ export default {
         label: "Create date",
         sortable: false,
       },
+      {
+        name: "actions",
+        sortable: false,
+        label: "Actions",
+      },
     ]);
-
-    const getTokens = async (props) => {
-      // console.log(props);
-      const { page, rowsPerPage, sortBy, descending } = props.pagination;
-      // update pagination
-      pagination.value.page = page;
-      pagination.value.rowsPerPage = rowsPerPage;
-      pagination.value.sortBy = sortBy;
-      pagination.value.descending = descending;
-      loading.value = true;
-      const response = await fetchTokens({
-        page: pagination.value.page,
-        limit: pagination.value.rowsPerPage,
-      });
-      loading.value = false;
-      tokens.value = response.data;
-      tokens.value.splice(0, tokens.value.length, ...response.data);
-      pagination.value.rowsNumber = response.count;
-    };
-
-    onMounted(() => {
-      getTokens({ pagination: pagination.value });
-    });
+    // tokens repo
+    const { tokens, loading, pagination, tableTokens, getData } = fetchTokens();
 
     return {
-      getTokens,
-      tableTokens: computed(() =>
-        [...tokens.value].map((token) => {
-          return {
-            name: token.name,
-            id: token.id,
-            created_at: token.created_at,
-          };
-        })
-      ),
+      getData,
+      tableTokens,
       tokens,
       pagination,
       loading,

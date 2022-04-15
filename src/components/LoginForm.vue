@@ -4,15 +4,17 @@
     @submit.stop="onSubmit"
     @reset="onReset"
     class="q-gutter-md"
-    id="loginForm"
+    ref="loginForm"
   >
     <q-input
       filled
       v-model="login"
+      required
       type="email"
       label="Your Login"
       hint="Use email for login"
       lazy-rules
+      :rules="emailRules"
     />
 
     <q-input
@@ -21,6 +23,7 @@
       v-model="password"
       label="Your password"
       lazy-rules
+      :rules="[(val) => (val && val.length > 0) || 'Password required']"
     />
 
     <q-toggle v-model="saveLogged" label="Remember me" />
@@ -41,17 +44,21 @@ export default {
   name: "login-form",
   setup() {
     const router = useRouter();
-
+    const loginForm = ref(null);
     let saveLogged = ref(false);
     let login = ref("");
     let password = ref("");
 
     const onSubmit = () => {
-      logIn({
-        email: login.value,
-        password: password.value,
-        saveLogged: saveLogged.value,
-      }).then(() => router.push("/dashboard"));
+      loginForm.value.validate().then((success) => {
+        if (success) {
+          logIn({
+            email: login.value,
+            password: password.value,
+            saveLogged: saveLogged.value,
+          }).then(() => router.push("/dashboard"));
+        }
+      });
     };
 
     return {
@@ -59,6 +66,7 @@ export default {
       login,
       saveLogged,
       password,
+      loginForm,
     };
   },
   methods: {
@@ -68,7 +76,39 @@ export default {
       this.password = "";
     },
   },
-  computed: {},
+  computed: {
+    fields() {
+      return [
+        {
+          component: "q-input",
+          type: "email",
+          label: "Your Login",
+          hint: "Use email for login",
+          value: "email",
+        },
+        {
+          component: "q-input",
+          type: "password",
+          label: "Your password",
+          value: "password",
+        },
+        {
+          component: "q-toggle",
+          label: "Remember me",
+          value: "saveLogged",
+        },
+      ];
+    },
+    emailRules() {
+      return [
+        (val) => (val && val.length > 3) || "Login required",
+        (val) =>
+          val.match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          ) || "Use email as login",
+      ];
+    },
+  },
 };
 </script>
 
