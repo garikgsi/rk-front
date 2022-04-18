@@ -6,27 +6,24 @@
     class="q-gutter-md"
     ref="loginForm"
   >
-    <q-input
-      filled
+    <app-email-input
       v-model="login"
-      required
-      type="email"
       label="Your Login"
+      :required="true"
       hint="Use email for login"
-      lazy-rules
-      :rules="emailRules"
-    />
+    ></app-email-input>
 
-    <q-input
-      filled
-      type="password"
+    <app-password-input
       v-model="password"
+      :required="true"
       label="Your password"
-      lazy-rules
-      :rules="[(val) => (val && val.length > 0) || 'Password required']"
-    />
+    ></app-password-input>
 
-    <q-toggle v-model="saveLogged" label="Remember me" />
+    <app-checkbox-input
+      v-model="saveLogged"
+      label="Remember me"
+      toggler
+    ></app-checkbox-input>
 
     <div>
       <q-btn label="Submit" type="submit" color="primary" />
@@ -39,6 +36,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { logIn } from "@/composition/appAuth";
+import AppEmailInputVue from "./UI/inputs/AppEmailInput.vue";
+import AppPasswordInputVue from "./UI/inputs/AppPasswordInput.vue";
+import AppCheckboxInputVue from "./UI/inputs/AppCheckboxInput.vue";
 
 export default {
   name: "login-form",
@@ -68,6 +68,11 @@ export default {
       password,
       loginForm,
     };
+  },
+  components: {
+    "app-email-input": AppEmailInputVue,
+    "app-password-input": AppPasswordInputVue,
+    "app-checkbox-input": AppCheckboxInputVue,
   },
   methods: {
     onReset() {

@@ -51,15 +51,13 @@ export default function tokensRepository() {
   });
   // format data for table
   const tableTokens = computed(() => {
-    return [...tokens.value]
-      .filter((token) => token.name != "siteAuth")
-      .map((token) => {
-        return {
-          name: token.name,
-          id: token.id,
-          created_at: token.created_at,
-        };
-      });
+    return [...tokens.value].map((token) => {
+      return {
+        name: token.name,
+        id: token.id,
+        created_at: token.created_at,
+      };
+    });
   });
   // create token request
   const createToken = () => {
