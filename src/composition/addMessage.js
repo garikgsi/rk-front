@@ -1,7 +1,7 @@
 import store from "@/store";
 
 const createMessage = (message, type) => {
-  store.dispatch("app/addMessage", {
+  return store.dispatch("app/addMessage", {
     message,
     type,
   });

@@ -12,7 +12,7 @@
     >
       <template v-slot:top>
         <q-toolbar class="bg-primary text-white" align="right">
-          <q-btn flat @click="addToken">Create new token</q-btn>
+          <q-btn flat :to="{ name: 'token-add' }">Create new token</q-btn>
         </q-toolbar>
       </template>
 
@@ -21,17 +21,23 @@
           <q-btn
             icon="delete_outline"
             flat
-            @click="revokeToken(props.row.id)"
+            @click="runDialog(props.row.id)"
           ></q-btn>
         </q-td>
       </template>
     </q-table>
+    <app-dialog
+      v-model="openDialog"
+      title="Do you realy want revoke this token?"
+      sub-title="You can not restore revoked token!"
+      @select="dialogSelect($event)"
+    ></app-dialog>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
-import fetchTokens from "@/composition/tokens/fetchTokens";
+import tokensRepository from "@/composition/tokens/tokensRepository";
 
 export default {
   name: "token-list",
@@ -51,7 +57,8 @@ export default {
       },
     ]);
     // tokens repo
-    const { tokens, loading, pagination, tableTokens, getData } = fetchTokens();
+    const { tokens, loading, pagination, tableTokens, getData, deleteToken } =
+      tokensRepository();
 
     return {
       getData,
@@ -60,7 +67,40 @@ export default {
       pagination,
       loading,
       columns,
+      deleteToken,
     };
+  },
+  data() {
+    return {
+      openDialog: false,
+      revokeTokenId: null,
+    };
+  },
+  methods: {
+    dialogSelect(action) {
+      switch (action) {
+        case "yes":
+          {
+            this.deleteConfirmed();
+          }
+          break;
+        case "no": {
+          this.cancelDeleteToken();
+        }
+      }
+    },
+    runDialog(tokenId) {
+      this.revokeTokenId = tokenId;
+      this.openDialog = true;
+    },
+    cancelDeleteToken() {
+      this.revokeTokenId = null;
+      this.openDialog = false;
+    },
+    deleteConfirmed() {
+      this.deleteToken(this.revokeTokenId);
+      this.openDialog = false;
+    },
   },
 };
 </script>

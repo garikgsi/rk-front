@@ -14,8 +14,8 @@ export default {
     },
   },
   actions: {
-    addMessage({ commit }, { message, type }) {
-      commit("ADD_MESSAGE", { message, type });
+    async addMessage({ commit }, { message, type }) {
+      await commit("ADD_MESSAGE", { message, type });
     },
     setRead({ commit }, { id }) {
       commit("SET_READ", { id });

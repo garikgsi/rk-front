@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView";
-import TokensView from "@/views/TokensView";
+import TokensView from "@/views/tokens/TokensView";
 import store from "@/store";
 import DashboardVue from "@/views/Dashboard.vue";
+import AddTokenViewVue from "@/views/tokens/AddTokenView.vue";
 
 const routes = [
   {
@@ -27,6 +28,11 @@ const routes = [
     path: "/tokens",
     name: "tokens",
     component: TokensView,
+  },
+  {
+    path: "/token-add",
+    name: "token-add",
+    component: AddTokenViewVue,
   },
 ];
 

@@ -1,6 +1,6 @@
 import store from "@/store";
 import { addInfo } from "./addMessage";
-import { post, get, addToken, removeToken } from "./requestApi";
+import { apiPost, apiGet, addToken, removeToken } from "./requestApi";
 import { addError } from "./addMessage";
 import {
   storageAdd,
@@ -23,7 +23,7 @@ const logIn = async ({ email, password, saveLogged }) => {
   requestData.append("password", password);
   requestData.append("device_name", "siteAuth");
 
-  const response = await post({
+  const response = await apiPost({
     url: "auth/token",
     data: requestData,
   });
@@ -35,6 +35,7 @@ const logIn = async ({ email, password, saveLogged }) => {
   } else {
     const userData = { email, token: data };
     store.dispatch("user/setUser", userData);
+    addToken(data);
     addInfo("You are logged in!");
     if (saveLogged) storageAdd("user", userData);
     return true;
@@ -47,7 +48,7 @@ const checkStoredUser = async () => {
     const userData = storageGet("user");
     const { token } = userData;
 
-    const userResponse = await get({ url: "auth/user", token });
+    const userResponse = await apiGet({ url: "auth/user", token });
     if (userResponse) {
       store.dispatch("user/setUser", userData);
       addToken(token);

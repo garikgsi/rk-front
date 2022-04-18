@@ -11,7 +11,7 @@ const removeToken = () =>
   (axios.defaults.headers.common["Authorization"] = null);
 
 // basic request
-const request = async ({ method, url, data, params = {}, token = null }) => {
+const apiRequest = async ({ method, url, data, params = {}, token = null }) => {
   const axiosCfg = {
     url: `${apiUrl}/${url}`,
     method,
@@ -56,14 +56,19 @@ const request = async ({ method, url, data, params = {}, token = null }) => {
 };
 
 // get request
-const get = ({ url, params = {}, token = null }) => {
-  const response = request({ method: "get", url, token, params });
+const apiGet = ({ url, params = {}, token = null }) => {
+  const response = apiRequest({ method: "get", url, token, params });
   return response;
 };
 
 // post request
-const post = ({ url, data, token = null }) => {
-  return request({ method: "post", url, data, token });
+const apiPost = ({ url, data, token = null }) => {
+  return apiRequest({ method: "post", url, data, token });
 };
 
-export { request, get, post, addToken, removeToken };
+// delete request
+const apiDelete = ({ url, params, token = null }) => {
+  return apiRequest({ method: "delete", url, params, token });
+};
+
+export { apiRequest, apiGet, apiPost, apiDelete, addToken, removeToken };

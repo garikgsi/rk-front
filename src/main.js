@@ -7,6 +7,7 @@ import quasarUserOptions from "./quasar-user-options";
 
 import directives from "@/directives/index";
 import AppPageVue from "./views/AppSkeleton/AppPage.vue";
+import AppDialogVue from "./components/UI/AppDialog.vue";
 
 const app = createApp(App)
   .use(Quasar, quasarUserOptions)
@@ -18,5 +19,6 @@ directives.forEach((directive) => {
 });
 
 app.component("app-page", AppPageVue);
+app.component("app-dialog", AppDialogVue);
 
 app.mount("#app");
