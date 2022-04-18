@@ -5,26 +5,19 @@
     class="q-gutter-md"
     ref="tokenForm"
   >
-    <q-input
-      filled
+    <app-text-input
       v-model="deviceName"
       required
-      type="text"
       label="Device name"
       hint="What device you create token for"
-      lazy-rules
-      :rules="[(val) => (!!val && val.length > 0) || 'Device name required']"
-    />
-
-    <q-select
+    ></app-text-input>
+    <app-select-input
       v-model="tokenAbilities"
       :options="abilitiesOptions"
       label="Abilities"
-      :multiple="true"
-      :rules="[
-        (val) => (!!val && val.length > 0) || 'Select one or more abilities',
-      ]"
-    />
+      multiple
+      required
+    ></app-select-input>
 
     <div>
       <q-btn label="Submit" type="submit" color="primary" />
@@ -34,8 +27,14 @@
 </template>
 
 <script>
+import AppSelectInputVue from "../UI/inputs/AppSelectInput.vue";
+import AppTextInputVue from "../UI/inputs/AppTextInput.vue";
 export default {
   name: "token-form",
+  components: {
+    "app-text-input": AppTextInputVue,
+    "app-select-input": AppSelectInputVue,
+  },
   props: {
     abilities: {
       require: true,
