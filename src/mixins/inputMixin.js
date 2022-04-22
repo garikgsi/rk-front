@@ -2,7 +2,7 @@ export default {
   props: {
     modelValue: {
       require: true,
-      type: String,
+      type: [String, Number],
       default: "",
     },
     label: {
@@ -16,6 +16,16 @@ export default {
       default: null,
     },
     required: {
+      require: false,
+      type: Boolean,
+      default: false,
+    },
+    clearable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+    loading: {
       require: false,
       type: Boolean,
       default: false,

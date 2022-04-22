@@ -19,7 +19,7 @@
         <q-item-section avatar>
           <q-icon color="primary" name="logout"></q-icon>
         </q-item-section>
-        <q-item-section> Exit from app </q-item-section>
+        <q-item-section> Выйти из приложения </q-item-section>
       </q-item>
     </q-list>
   </div>

@@ -1,23 +1,31 @@
 <template>
-  <q-select
-    v-model="value"
-    :options="options"
-    :label="label"
-    :multiple="multiple"
-    :rules="fieldRules"
-  />
+  <div>
+    <q-select
+      v-model="value"
+      filled
+      use-input
+      :clearable="clearable"
+      :options="selectOptions"
+      :label="label"
+      :multiple="multiple"
+      :loading="loading"
+      :rules="fieldRules"
+      :option-label="optionLabel"
+      :option-value="optionValue"
+      @filter="filterFn"
+    />
+  </div>
 </template>
 
 <script>
 import inputMixin from "@/mixins/inputMixin";
+import { ref, toRefs } from "vue";
 export default {
   name: "app-select-input",
   mixins: [inputMixin],
   props: {
     modelValue: {
       require: true,
-      type: Array || String || Number,
-      default: "",
     },
     options: {
       require: true,
@@ -28,6 +36,34 @@ export default {
       type: Boolean,
       default: false,
     },
+    optionLabel: {
+      require: false,
+      type: String,
+      default: "title",
+    },
+    optionValue: {
+      require: false,
+      type: String,
+      default: "id",
+    },
+  },
+  setup(props) {
+    const { options, optionLabel } = toRefs(props);
+    let selectOptions = ref(options.value);
+
+    const filterFn = (val, update) => {
+      update(() => {
+        const needle = val.toLowerCase();
+        selectOptions.value = options.value.filter(
+          (v) => v[optionLabel.value].toLowerCase().indexOf(needle) > -1
+        );
+      });
+    };
+
+    return {
+      selectOptions,
+      filterFn,
+    };
   },
   computed: {
     fieldRules() {
@@ -37,7 +73,7 @@ export default {
         if (this.required) {
           return [
             (val) => {
-              return !!val && val.length > 0
+              return val
                 ? true
                 : this.multiple
                 ? `Выберите одно или несколько значений поля ${this.label}`

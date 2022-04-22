@@ -19,10 +19,13 @@
 
     <q-footer bordered class="bg-white text-primary">
       <q-tabs class="text-primary" align="justify">
-        <q-tab name="about" icon="info" label="About" />
-        <q-tab name="sms" icon="sms" label="SMS" />
-        <q-tab name="contacts" icon="contacts" label="Contacts" />
-        <q-tab name="faq" icon="help" label="FAQ" />
+        <q-route-tab
+          :icon="menu.icon"
+          :label="menu.title"
+          :to="menu.to"
+          v-for="menu in footerMenu"
+          :key="menu.id"
+        />
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -70,10 +73,65 @@ export default {
       isAuth: "user/isAuth",
     }),
     sideBarMenu() {
-      return [{ to: { name: "tokens" }, title: "My tokens", icon: "api" }];
+      return [
+        { to: { name: "tokens" }, title: "My tokens", icon: "api" },
+        {
+          to: { name: "plans" },
+          title: "Планирование бюджета",
+          icon: "show_chart",
+        },
+        {
+          to: { name: "operations" },
+          title: "Расходные операции",
+          icon: "point_of_sale",
+        },
+        {
+          to: { name: "payments" },
+          title: "Оплаты",
+          icon: "account_balance_wallet",
+        },
+        {
+          to: { name: "kids" },
+          title: "Ученики и родители",
+          icon: "family_restroom",
+        },
+        {
+          to: { name: "debt" },
+          title: "Долги",
+          icon: "money_off",
+        },
+      ];
     },
     headerMenu() {
-      return [{ to: { name: "dashboard" }, title: "Dashboard" }];
+      return [{ to: { name: "dashboard" }, title: "Главная" }];
+    },
+    footerMenu() {
+      return [
+        {
+          id: 1,
+          to: { name: "plans" },
+          title: "Планирование бюджета",
+          icon: "show_chart",
+        },
+        {
+          id: 2,
+          to: { name: "operations" },
+          title: "Расходные операции",
+          icon: "point_of_sale",
+        },
+        {
+          id: 3,
+          to: { name: "payments" },
+          title: "Оплаты",
+          icon: "account_balance_wallet",
+        },
+        {
+          id: 3,
+          to: { name: "debt" },
+          title: "Долги",
+          icon: "money_off",
+        },
+      ];
     },
   },
 };

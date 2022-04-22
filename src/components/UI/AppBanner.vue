@@ -43,7 +43,7 @@ export default {
     classes() {
       switch (this.msg.type) {
         case "info": {
-          return "bg-primary";
+          return "bg-positive";
         }
         case "error": {
           return "bg-red";

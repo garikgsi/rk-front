@@ -49,6 +49,7 @@ export default {
     let login = ref("");
     let password = ref("");
 
+    // submit action
     const onSubmit = () => {
       loginForm.value.validate().then((success) => {
         if (success) {
@@ -60,9 +61,16 @@ export default {
         }
       });
     };
+    // reset action
+    const onReset = () => {
+      this.saveLogged = false;
+      this.login = "";
+      this.password = "";
+    };
 
     return {
       onSubmit,
+      onReset,
       login,
       saveLogged,
       password,
@@ -73,46 +81,6 @@ export default {
     "app-email-input": AppEmailInputVue,
     "app-password-input": AppPasswordInputVue,
     "app-checkbox-input": AppCheckboxInputVue,
-  },
-  methods: {
-    onReset() {
-      this.saveLogged = false;
-      this.login = "";
-      this.password = "";
-    },
-  },
-  computed: {
-    fields() {
-      return [
-        {
-          component: "q-input",
-          type: "email",
-          label: "Your Login",
-          hint: "Use email for login",
-          value: "email",
-        },
-        {
-          component: "q-input",
-          type: "password",
-          label: "Your password",
-          value: "password",
-        },
-        {
-          component: "q-toggle",
-          label: "Remember me",
-          value: "saveLogged",
-        },
-      ];
-    },
-    emailRules() {
-      return [
-        (val) => (val && val.length > 3) || "Login required",
-        (val) =>
-          val.match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          ) || "Use email as login",
-      ];
-    },
   },
 };
 </script>

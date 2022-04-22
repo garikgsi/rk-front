@@ -15,7 +15,7 @@
       stretch
       flat
       size="lg"
-      label="SMS Application"
+      label="Родительский комитет"
       to="/"
     />
     <q-space></q-space>
@@ -28,9 +28,9 @@
           :to="item.to"
         ></q-btn>
 
-        <q-btn label="Logout" @click="logOut"></q-btn>
+        <q-btn label="Выйти" @click="logOut"></q-btn>
       </template>
-      <q-btn v-else label="Login" :to="{ name: 'login' }"></q-btn>
+      <q-btn v-else label="Войти" :to="{ name: 'login' }"></q-btn>
     </q-btn-group>
   </q-toolbar>
 </template>

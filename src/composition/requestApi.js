@@ -66,9 +66,28 @@ const apiPost = ({ url, data, token = null }) => {
   return apiRequest({ method: "post", url, data, token });
 };
 
+// put request
+const apiPut = ({ url, params, data, token = null }) => {
+  return apiRequest({ method: "put", url, data, params, token });
+};
+
+// patch request
+const apiPatch = ({ url, params, data, token = null }) => {
+  return apiRequest({ method: "patch", url, data, params, token });
+};
+
 // delete request
 const apiDelete = ({ url, params, token = null }) => {
   return apiRequest({ method: "delete", url, params, token });
 };
 
-export { apiRequest, apiGet, apiPost, apiDelete, addToken, removeToken };
+export {
+  apiRequest,
+  apiGet,
+  apiPost,
+  apiPut,
+  apiPatch,
+  apiDelete,
+  addToken,
+  removeToken,
+};
