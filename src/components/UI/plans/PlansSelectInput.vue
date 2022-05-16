@@ -1,6 +1,6 @@
 <template>
   <app-select-input
-    v-model="value"
+    :modelValue="value"
     :options="options"
     :multiple="multiple"
     :required="required"
@@ -8,6 +8,7 @@
     :hint="hint"
     option-label="title"
     option-value="id"
+    @update:modelValue="changeSelect"
   ></app-select-input>
 </template>
 
@@ -16,15 +17,17 @@ import inputMixin from "@/mixins/inputMixin";
 
 import AppSelectInputVue from "../inputs/AppSelectInput.vue";
 import planRepository from "@/composition/plans/planRepository";
-import { computed } from "vue";
-// import { onMounted, computed } from "vue";
+import planSearch from "@/composition/plans/planSearch";
+import { computed, toRefs } from "vue";
+
 export default {
-  name: "plans-select-input",
+  // name: "plans-select-input",
   mixins: [inputMixin],
   props: {
     modelValue: {
       require: true,
-      type: Object,
+      type: [Number, null],
+      default: null,
     },
     multiple: {
       require: false,
@@ -32,27 +35,49 @@ export default {
       default: false,
     },
   },
-  setup() {
-    let { items } = planRepository();
-    // let { items, fetchSelectData } = planRepository();
+  setup(props, { emit }) {
+    // plan items from db
+    let { planItems } = planRepository();
 
-    // load data on mouted
-    // onMounted(() => {
-    //   fetchSelectData().then((planItems) => (items.value = planItems));
-    // });
+    // props
+    const { modelValue } = toRefs(props);
+
+    // search plan function
+    const { getPlanById } = planSearch();
+
+    // select value
+    const value = computed(() => {
+      if (modelValue.value) {
+        return getPlanById(modelValue.value);
+      }
+      return null;
+    });
+
+    // change select option
+    const changeSelect = (newValue) => {
+      emit("update:modelValue", newValue?.id);
+    };
+
+    // select options
+    const options = computed(() => {
+      if (planItems.value) {
+        return [...planItems.value]
+          .map((item) => {
+            return { id: item.id, title: item.title };
+          })
+          .sort((a, b) => a.title.localeCompare(b.title));
+      } else {
+        return [];
+      }
+    });
 
     return {
-      options: computed(() => {
-        if (items.value) {
-          return [...items.value].map((item) => {
-            return { id: item.id, title: item.title };
-          });
-        } else {
-          return [];
-        }
-      }),
+      options,
+      value,
+      changeSelect,
     };
   },
+  emits: ["update:modelValue"],
   components: {
     "app-select-input": AppSelectInputVue,
   },

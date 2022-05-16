@@ -7,7 +7,7 @@
     >
       <div class="row">
         <div
-          class="col col-4 q-mr-sm q-mb-sm"
+          class="col-12 col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 q-pa-md"
           n
           v-for="(widget, i) in widgets"
           :key="i"

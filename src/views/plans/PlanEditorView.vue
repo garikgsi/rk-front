@@ -1,13 +1,20 @@
 <template>
-  <app-page :title="pageTitle" icon="show_chart" :sub-title="pageSubTitle">
-    <plan-form :id="id" :periodId="periodId"></plan-form>
+  <app-page
+    :title="pageTitle"
+    icon="show_chart"
+    :sub-title="pageSubTitle"
+    :show-period-selector="false"
+  >
+    <plan-view :id="id" v-if="mode == 'view'"></plan-view>
+    <plan-form :id="id" :mode="mode" v-else></plan-form>
   </app-page>
 </template>
 
 <script>
 import PlanFormVue from "@/components/plans/PlanForm.vue";
 import { toRefs, computed, onMounted, ref } from "vue";
-import planRepository from "@/composition/plans/planRepository";
+import planSearch from "@/composition/plans/planSearch";
+import PlanViewVue from "@/components/plans/PlanView.vue";
 
 export default {
   name: "plan-editor-view",
@@ -17,14 +24,16 @@ export default {
       type: String,
       default: undefined,
     },
-    periodId: {
-      require: true,
+    mode: {
+      require: false,
       type: String,
+      default: "add",
     },
   },
   setup(props) {
-    const { id } = toRefs(props);
-    const { findPlan } = planRepository();
+    const { id, mode } = toRefs(props);
+
+    const { getPlanById } = planSearch();
 
     let item = ref({
       title: "",
@@ -32,20 +41,46 @@ export default {
 
     // get actual item from repository if id exists
     onMounted(() => {
-      findPlan(id.value).then((planItem) => {
-        item.value = { ...planItem };
-      });
+      item.value = { ...getPlanById(id.value) };
     });
 
     // page titles
-    const pageTitle = computed(() =>
-      id.value ? `Редактируем запись бюджета` : `Создание записи в бюджет`
-    );
-    const pageSubTitle = computed(() =>
-      id.value
-        ? `Изменяем данные для записи ${item.value.title}`
-        : `Добавление новой записи в бюджет на текущий период`
-    );
+    const pageTitle = computed(() => {
+      if (id.value) {
+        switch (mode.value) {
+          case "edit": {
+            return `Редактируем запись бюджета`;
+          }
+          case "view": {
+            return `Просмотр записи бюджета`;
+          }
+          case "copy":
+          default: {
+            return `Копируем запись бюджета`;
+          }
+        }
+      } else {
+        return `Создание записи в бюджет`;
+      }
+    });
+    const pageSubTitle = computed(() => {
+      if (id.value) {
+        switch (mode.value) {
+          case "edit": {
+            return `Изменяем данные для записи ${item.value.title}`;
+          }
+          case "view": {
+            return `Просмотр ${item.value.title}`;
+          }
+          case "copy":
+          default: {
+            return `Копируем запись ${item.value.title}`;
+          }
+        }
+      } else {
+        return `Добавление новой записи в бюджет на текущий период`;
+      }
+    });
 
     return {
       pageTitle,
@@ -54,6 +89,7 @@ export default {
   },
   components: {
     "plan-form": PlanFormVue,
+    "plan-view": PlanViewVue,
   },
 };
 </script>

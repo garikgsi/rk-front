@@ -36,7 +36,7 @@ export default {
           this.isShow = false;
         }
         this.setRead({ id: this.msg.id });
-      }, this.timeout * 1000);
+      }, this.waitSeconds * 1000);
     }
   },
   computed: {
@@ -52,6 +52,12 @@ export default {
           return "bg-green";
         }
       }
+    },
+    waitSeconds() {
+      if (this.msg.type == "error") {
+        return 60;
+      }
+      return this.timeout;
     },
   },
   methods: {

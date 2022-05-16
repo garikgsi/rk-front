@@ -1,4 +1,5 @@
 import axios from "axios";
+import { addError } from "@/composition/addMessage";
 
 // url API
 const apiUrl = "http://laravel.test/api/v1";
@@ -35,10 +36,10 @@ const apiRequest = async ({ method, url, data, params = {}, token = null }) => {
     const response = await axios.request(axiosCfg);
 
     const status = response.status;
-    const { data, error, isError, count } = response.data;
+    const { data, error, is_error, count } = response.data;
     result = {
       ...result,
-      ...{ data, error, isError, code: status, count },
+      ...{ data, error, isError: is_error, code: status, count },
     };
   } catch (error) {
     result = {
@@ -51,6 +52,7 @@ const apiRequest = async ({ method, url, data, params = {}, token = null }) => {
           : "Check internet connection",
       },
     };
+    addError(result.error);
   }
   return result;
 };
@@ -68,12 +70,14 @@ const apiPost = ({ url, data, token = null }) => {
 
 // put request
 const apiPut = ({ url, params, data, token = null }) => {
-  return apiRequest({ method: "put", url, data, params, token });
+  data.append("_method", "PUT");
+  return apiRequest({ method: "post", url, data, params, token });
 };
 
 // patch request
 const apiPatch = ({ url, params, data, token = null }) => {
-  return apiRequest({ method: "patch", url, data, params, token });
+  data.append("_method", "PATCH");
+  return apiRequest({ method: "post", url, data, params, token });
 };
 
 // delete request

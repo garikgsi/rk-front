@@ -1,95 +1,169 @@
 <template>
-  <q-table
-    :rows="items"
+  <app-table
+    :items="items"
     :columns="columns"
-    row-key="id"
-    no-data-label="Нет данных за период"
-    v-model:pagination="pagination"
-    :loading="loading"
-    @request="getData"
-    :binary-state-sort="true"
-    :rows-per-page-options="[100, 200, 0]"
-  >
-    <template v-slot:top-left>
-      <q-toolbar class="" align="right">
-        <q-btn color="primary" :to="{ name: 'plan-form' }">Добавить</q-btn>
-        <q-separator vertical inset spaced="md"></q-separator>
-      </q-toolbar>
-    </template>
-
-    <template v-slot:bottom-row="cols">
-      <q-tr class="total-tr">
-        <q-td
-          v-for="(col, index) in cols.cols"
-          :key="index"
-          :class="[{ 'text-right': col.name == 'amount' }, 'text-h6']"
-        >
-          <span v-if="col.name == 'amount'">{{ totalAmount }}</span>
-          <span v-else-if="col.name == 'title'">ИТОГО:</span>
-          <span v-else></span>
-        </q-td>
-      </q-tr>
-    </template>
-
-    <template v-slot:body-cell-actions="props">
-      <q-td :props="props">
-        <table-edit-button
-          :to="{
-            name: 'plan-form',
-            params: { id: props.row.id },
-          }"
-        ></table-edit-button>
-        <table-delete-button
-          :sub-title="`Действительно удаляем ${props.row.title}?`"
-          @submitted="remove(props.row.id)"
-        ></table-delete-button>
-      </q-td>
-    </template>
-  </q-table>
+    :editable="true"
+    :totalRow="{ title: 'ИТОГО:', amount: totalAmount }"
+    v-model:search="tableSearchString"
+    :pagination="pagination"
+    @update:pagination="updatePagination"
+    @row-click="rowClick"
+    @add-click="addClick"
+    @edit-click="editClick"
+    @copy-click="copyClick"
+    @delete-click="deleteClick"
+  ></app-table>
 </template>
 
 <script>
-import TableDeleteButtonVue from "../UI/table/TableDeleteButton.vue";
-import TableEditButtonVue from "../UI/table/TableEditButton.vue";
+import AppTableVue from "../UI/table/AppTable.vue";
+
+import { computed, watch, ref, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+import currentPeriod from "@/composition/periods/currentPeriod";
 import planRepository from "@/composition/plans/planRepository";
-import { ref, onMounted } from "vue";
+import tablePagination from "@/composition/tablePagination";
+
 export default {
   name: "plan-list",
   components: {
-    "table-delete-button": TableDeleteButtonVue,
-    "table-edit-button": TableEditButtonVue,
+    "app-table": AppTableVue,
   },
 
   setup() {
-    const {
-      pagination,
-      columns,
-      totalAmount,
-      removePlan,
-      getData,
-      fetchTableData,
-    } = planRepository();
-    let { items } = planRepository();
-    const loading = ref(false);
+    // vuex store
+    const store = useStore();
+    // router
+    const router = useRouter();
+    // table columns
+    const columns = ref([
+      {
+        name: "title",
+        field: "title",
+        label: "Статья расходов",
+        sortable: false,
+        align: "left",
+        type: "string",
+      },
+      {
+        name: "amount",
+        field: "amount",
+        label: "Сумма",
+        align: "right",
+        sortable: false,
+        type: "money",
+      },
+      {
+        name: "actions",
+        field: "actions",
+        label: "",
+        align: "right",
+        sortable: false,
+        type: "actions",
+      },
+    ]);
+    // current period
+    const { periodId } = currentPeriod();
+    // all plans data for period
+    const { planItems, fetchPlansData } = planRepository();
+    // is loading prop for plans
+    const loading = computed(() => store.state.plans.loading);
+    // search line
+    let tableSearchString = ref("");
+
+    // fetch data on mounting
+    onMounted(() => {
+      fetchPlansData();
+    });
+
+    // refresh data with new period
+    watch(periodId, () => {
+      fetchPlansData();
+    });
+
+    // formatted table rows
+    const tableRows = computed(() => {
+      if (planItems.value) {
+        let res = [...planItems.value];
+        if (tableSearchString.value && tableSearchString.value.length > 0) {
+          res = res.filter((row) => {
+            return (
+              row.title
+                .toLowerCase()
+                .indexOf(tableSearchString.value.toLowerCase()) > -1
+            );
+          });
+        }
+        res = res.map((row) => {
+          return { id: row.id, title: row.title, amount: row.amount };
+        });
+
+        return res;
+      }
+      return [];
+    });
+
+    // calc itog amount
+    const totalAmount = computed(() => {
+      return [...tableRows.value].reduce((acc, row) => {
+        return acc + parseFloat(row.amount);
+      }, 0);
+    });
 
     // remove row
     const remove = (id) => {
-      removePlan({ id }).then(fetchTableData());
+      store.dispatch("plans/removePlan", { id, params: {} });
     };
 
-    // load data on mouted
-    onMounted(() => {
-      items.value = fetchTableData();
-    });
+    // table pagination from store
+    const { pagination, updatePagination } = tablePagination("plans");
+
+    // row click
+    const rowClick = (evt, row) => {
+      router.push({
+        name: "plan-form",
+        params: { id: row.id, mode: "view" },
+      });
+    };
+    // CRUD
+    // click add
+    const addClick = () => {
+      router.push({ name: "plan-form" });
+    };
+    // click edit
+    const editClick = (row) => {
+      router.push({
+        name: "plan-form",
+        params: { id: row.id, mode: "edit" },
+      });
+    };
+    // click copy
+    const copyClick = (row) => {
+      router.push({
+        name: "plan-form",
+        params: { id: row.id, mode: "copy" },
+      });
+    };
+    // click delete
+    const deleteClick = (row) => {
+      remove(row.id);
+    };
 
     return {
-      items,
-      pagination,
+      items: tableRows,
       columns,
-      loading,
       totalAmount,
-      remove,
-      getData,
+      loading,
+      deleteClick,
+      pagination,
+      updatePagination,
+      tableSearchString,
+      rowClick,
+      addClick,
+      editClick,
+      copyClick,
     };
   },
 };

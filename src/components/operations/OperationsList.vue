@@ -1,102 +1,194 @@
 <template>
-  <q-table
-    :rows="items"
+  <app-table
+    :items="items"
     :columns="columns"
-    row-key="id"
-    no-data-label="Нет данных за период"
-  >
-    <template v-slot:top-left>
-      <q-toolbar class="" align="right">
-        <q-btn
-          color="primary"
-          :to="{
-            name: 'operations-form',
-          }"
-          >Добавить</q-btn
-        >
-        <q-separator vertical inset spaced="md"></q-separator>
-      </q-toolbar>
-    </template>
-
-    <template v-slot:bottom-row="cols">
-      <q-tr class="total-tr">
-        <q-td
-          v-for="(col, index) in cols.cols"
-          :key="index"
-          :class="[{ 'text-right': col.name == 'amount' }, 'text-h6']"
-        >
-          <span v-if="col.name == 'amount'">{{ totalAmount }}</span>
-          <span v-else-if="col.name == 'date_operation'">ИТОГО:</span>
-          <span v-else></span>
-        </q-td>
-      </q-tr>
-    </template>
-
-    <template v-slot:body-cell-comment="props">
-      <q-td :props="props">
-        <div>
-          {{ props.row.comment.substring(0, 60) }}
-          <q-tooltip>{{ props.row.comment }}</q-tooltip>
-        </div>
-      </q-td>
-    </template>
-    <template v-slot:body-cell-actions="props">
-      <q-td :props="props">
-        <table-edit-button
-          :to="{
-            name: 'operations-form',
-            params: { id: props.row.id },
-          }"
-        ></table-edit-button>
-        <table-delete-button
-          :sub-title="`Действительно удаляем ${props.row.title}?`"
-          @submitted="remove(props.row.id)"
-        ></table-delete-button>
-      </q-td>
-    </template>
-  </q-table>
+    :editable="true"
+    :totalRow="{ title: 'ИТОГО:', amount: totalAmount }"
+    v-model:search="tableSearchString"
+    :pagination="pagination"
+    @update:pagination="updatePagination"
+    @row-click="rowClick"
+    @add-click="addClick"
+    @edit-click="editClick"
+    @copy-click="copyClick"
+    @delete-click="deleteClick"
+  ></app-table>
 </template>
 
 <script>
-import TableDeleteButtonVue from "../UI/table/TableDeleteButton.vue";
-import TableEditButtonVue from "../UI/table/TableEditButton.vue";
-import { ref, onMounted } from "vue";
+import AppTableVue from "@/components/UI/table/AppTable.vue";
+
+import { computed, watch, ref, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+import currentPeriod from "@/composition/periods/currentPeriod";
 import operationsRepository from "@/composition/operations/operationsRepository";
+import tablePagination from "@/composition/tablePagination";
+
 export default {
   name: "operations-list",
   components: {
-    "table-delete-button": TableDeleteButtonVue,
-    "table-edit-button": TableEditButtonVue,
+    "app-table": AppTableVue,
   },
-  setup() {
-    const { pagination, columns, totalAmount, removeOperation, getData } =
-      operationsRepository();
-    let { items } = operationsRepository();
-    const loading = ref(false);
 
-    // simple refresh data
-    const fetchData = () => {
-      return getData({ pagination: pagination.value });
-    };
+  setup() {
+    // vuex store
+    const store = useStore();
+    // router
+    const router = useRouter();
+
+    // table columns
+    const columns = ref([
+      {
+        name: "date_operation",
+        field: "date_operation",
+        label: "Дата",
+        sortable: true,
+        align: "left",
+        sortOrder: "ad",
+        type: "date",
+      },
+      {
+        name: "comment",
+        field: "comment",
+        label: "Комментарий",
+        align: "left",
+        sortable: false,
+        type: "string",
+      },
+      {
+        name: "amount",
+        field: "amount",
+        label: "Сумма",
+        align: "right",
+        sortable: false,
+        type: "money",
+      },
+      {
+        name: "image",
+        field: "image",
+        label: "Чек/накладная",
+        align: "right",
+        sortable: false,
+        type: "image",
+      },
+      {
+        name: "actions",
+        field: "actions",
+        label: "",
+        align: "right",
+        sortable: false,
+        type: "actions",
+      },
+    ]);
+
+    // current period
+    const { periodId } = currentPeriod();
+    // all operations data for period
+    const { operationItems, fetchOperationsData } = operationsRepository();
+    // is loading prop for plans
+    const loading = computed(() => store.state.operations.loading);
+    // search line
+    let tableSearchString = ref("");
+
+    // fetch data on mounting
+    onMounted(() => {
+      fetchOperationsData();
+    });
+
+    // refresh data with new period
+    watch(periodId, () => {
+      fetchOperationsData();
+    });
+
+    // formatted table rows
+    const tableRows = computed(() => {
+      if (operationItems.value) {
+        let res = [...operationItems.value];
+        if (tableSearchString.value && tableSearchString.value.length > 0) {
+          res = res.filter((row) => {
+            return (
+              row.comment
+                .toLowerCase()
+                .indexOf(tableSearchString.value.toLowerCase()) > -1
+            );
+          });
+        }
+        res = res.map((row) => {
+          return {
+            id: row.id,
+            comment: row.comment,
+            amount: row.amount,
+            date_operation: row.date_operation,
+            image: row.image ? row.image : row.check_url ? row.check_url : "",
+          };
+        });
+
+        return res;
+      }
+      return [];
+    });
+
+    // calc itog amount
+    const totalAmount = computed(() => {
+      return [...tableRows.value].reduce((acc, row) => {
+        return acc + parseFloat(row.amount);
+      }, 0);
+    });
+
+    // table pagination from store
+    const { pagination, updatePagination } = tablePagination("operations");
 
     // remove row
     const remove = (id) => {
-      removeOperation({ id }).then(fetchData());
+      store.dispatch("operations/removeOperation", { id, params: {} });
     };
 
-    // load data on mouted
-    onMounted(() => {
-      items = fetchData();
-    });
+    // row click
+    const rowClick = (evt, row) => {
+      router.push({
+        name: "operations-form",
+        params: { id: row.id, mode: "view" },
+      });
+    };
+    // CRUD
+    // click add
+    const addClick = () => {
+      router.push({ name: "operations-form" });
+    };
+    // click edit
+    const editClick = (row) => {
+      router.push({
+        name: "operations-form",
+        params: { id: row.id, mode: "edit" },
+      });
+    };
+    // click copy
+    const copyClick = (row) => {
+      router.push({
+        name: "operations-form",
+        params: { id: row.id, mode: "copy" },
+      });
+    };
+    // click delete
+    const deleteClick = (row) => {
+      remove(row.id);
+    };
 
     return {
-      items,
-      pagination,
+      items: tableRows,
       columns,
-      loading,
       totalAmount,
-      remove,
-      getData,
+      loading,
+      deleteClick,
+      pagination,
+      updatePagination,
+      tableSearchString,
+      rowClick,
+      addClick,
+      editClick,
+      copyClick,
     };
   },
 };

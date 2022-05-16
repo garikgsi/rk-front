@@ -5,6 +5,7 @@
         :label="submitText"
         type="submit"
         :color="submitColor"
+        v-if="saveable"
         @click="clickSubmit"
       />
       <q-btn
@@ -23,6 +24,7 @@
         :label="closeText"
         flat
         :color="closeColor"
+        v-if="closable"
       ></q-btn>
     </div>
   </div>
@@ -68,6 +70,11 @@ export default {
       default: true,
     },
     cancelable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+    saveable: {
       require: false,
       type: Boolean,
       default: true,

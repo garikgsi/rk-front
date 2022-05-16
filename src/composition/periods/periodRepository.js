@@ -1,23 +1,30 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
-import { ref } from "vue";
 import { addError } from "@/composition/addMessage";
+import { watch } from "vue";
+import planRepository from "@/composition/plans/planRepository";
+import operationsRepository from "@/composition/operations/operationsRepository";
+import paymentsRepository from "@/composition/payments/paymentsRepository";
 
 export default function periodRepository() {
   const store = useStore();
-  // period filds values
-  const title = ref("");
   // getters from store
   const periods = computed(() => store.state.periods.all);
-  const currentPeriod = computed(() => store.state.periods.current);
+  const currentPeriod = computed(() => store.getters["periods/currentPeriod"]);
+  const currentPeriodId = computed(() => store.state.periods.current);
+  const dataLoaded = computed(() => store.state.periods.dataLoaded);
+
+  const { fetchPlansData } = planRepository();
+  const { fetchOperationsData } = operationsRepository();
+  const { fetchPaymentsData } = paymentsRepository();
+
   // change current period
   const changePeriod = (id) => {
     return store.dispatch("periods/changePeriod", { id });
   };
+
   // add new period
   const addPeriod = async ({ data }) => {
-    const formData = new FormData();
-    formData.append("title", title.value);
     // return promise
     const response = store.dispatch("periods/addPeriod", { data });
     const { isError, error } = response;
@@ -28,8 +35,6 @@ export default function periodRepository() {
   };
   // edit period
   const editPeriod = async ({ id, data }) => {
-    const formData = new FormData();
-    formData.append("title", title.value);
     // return promise
     const response = store.dispatch("periods/editPeriod", {
       id,
@@ -39,23 +44,35 @@ export default function periodRepository() {
     if (isError) {
       addError(error);
     }
+    return response;
   };
   // get periods
   const getPeriods = async ({ params = {} }) => {
-    const response = store.dispatch("periods/getPeriods", { params });
-    const { isError, error } = response;
-    if (isError) {
-      addError(error);
-      return false;
-    } else {
-      return true;
+    if (!dataLoaded.value) {
+      const response = store.dispatch("periods/getPeriods", { params });
+      const { isError, error } = response;
+      if (isError) {
+        addError(error);
+        return false;
+      } else {
+        return true;
+      }
     }
   };
 
+  // actions on period changed
+  watch(currentPeriod, (newPeriod, oldPeriod) => {
+    if (oldPeriod?.id !== newPeriod.id) {
+      fetchPlansData();
+      fetchOperationsData();
+      fetchPaymentsData();
+    }
+  });
+
   return {
-    title,
     periods,
     currentPeriod,
+    currentPeriodId,
     changePeriod,
     addPeriod,
     editPeriod,

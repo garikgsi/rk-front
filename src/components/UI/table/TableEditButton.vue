@@ -1,5 +1,5 @@
 <template>
-  <q-btn icon="edit" flat :to="to"></q-btn>
+  <q-btn icon="edit" flat :to="to" @click.stop="click"></q-btn>
 </template>
 
 <script>
@@ -7,8 +7,14 @@ export default {
   name: "table-editt-button",
   props: {
     to: {
-      required: true,
-      type: [String, Object],
+      required: false,
+      type: [String, Object, null],
+      default: null,
+    },
+  },
+  methods: {
+    click() {
+      this.$emit("click");
     },
   },
 };

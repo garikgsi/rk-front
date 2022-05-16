@@ -19,10 +19,24 @@
           </q-card>
         </q-menu>
       </q-btn>
+      <q-btn label="Переименовать" flat color="primary">
+        <q-menu v-model="showEditPeriod">
+          <q-card>
+            <q-card-section>
+              <period-form
+                :id="currentPeriod.id"
+                class="q-pa-md form"
+                @closed="showEditPeriod = false"
+                @submitted="submittedEdit($event)"
+              ></period-form>
+            </q-card-section>
+          </q-card>
+        </q-menu>
+      </q-btn>
     </template>
     <div class="text-subtitle1">
       <div>
-        Текущий период: <span>{{ currentPeriod.title }}</span>
+        Текущий период: <span>{{ currentPeriod.name }}</span>
       </div>
     </div>
   </app-dashboard-widget>
@@ -43,15 +57,21 @@ export default {
   setup() {
     const { currentPeriod } = periodRepository();
     let showAddPeriod = ref(false);
+    let showEditPeriod = ref(false);
     // submitted add new period form
     const submitted = (response) => {
       if (response.data) showAddPeriod.value = false;
     };
-
+    // submitted edit period form
+    const submittedEdit = (response) => {
+      if (response.data) showEditPeriod.value = false;
+    };
     return {
       submitted,
+      submittedEdit,
       currentPeriod,
       showAddPeriod,
+      showEditPeriod,
     };
   },
 };

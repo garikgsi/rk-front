@@ -9,15 +9,27 @@
       label="Статья учета"
       required
       v-model="title"
+      name="title"
       v-focus
     ></app-text-input>
-    <app-money-input label="Цена" required v-model="price"></app-money-input>
+    <app-money-input
+      label="Цена"
+      required
+      v-model="price"
+      name="price"
+    ></app-money-input>
     <app-money-input
       label="Количество"
       required
       v-model="quantity"
+      name="quantity"
     ></app-money-input>
-    <app-money-input label="Сумма" required v-model="amount"></app-money-input>
+    <app-money-input
+      label="Сумма"
+      required
+      v-model="amount"
+      name="amount"
+    ></app-money-input>
     <form-buttons @close="closeForm"></form-buttons>
   </q-form>
 </template>
@@ -26,10 +38,14 @@
 import AppTextInputVue from "@/components/UI/inputs/AppTextInput.vue";
 import AppMoneyInputVue from "@/components/UI/inputs/AppMoneyInput.vue";
 import priceQuantityAmount from "@/composition/app-form/priceQuantityAmount";
-import planRepository from "@/composition/plans/planRepository";
+import FormButtonsVue from "@/components/UI/form/FormButtons.vue";
+
 import { useRouter } from "vue-router";
 import { ref, toRefs, onMounted } from "vue";
-import FormButtonsVue from "@/components/UI/form/FormButtons.vue";
+import { useStore } from "vuex";
+import currentPeriod from "@/composition/periods/currentPeriod";
+import planSearch from "@/composition/plans/planSearch";
+import kidsRepository from "@/composition/kids/kidsRepository";
 
 export default {
   name: "plan-form",
@@ -39,57 +55,71 @@ export default {
       type: String,
       default: undefined,
     },
-    periodId: {
-      require: true,
+    mode: {
+      require: false,
       type: String,
+      default: "add",
     },
   },
   setup(props) {
     const router = useRouter();
-    const { editPlan, addPlan, findPlan } = planRepository();
-    const { id, periodId } = toRefs(props);
+    const store = useStore();
+
+    const { id, mode } = toRefs(props);
     let { price, quantity, amount } = priceQuantityAmount();
+
+    const { kidsCount } = kidsRepository();
+
+    // current period
+    const { periodId } = currentPeriod();
+
+    // search by id function
+    const { getPlanById } = planSearch();
 
     // form inputs
     // price/quantity/amount imported
-    // id & periodId refs from props
+    // id refs from props
     let title = ref("");
 
     // fill inputs empty data
     const clearForm = () => {
       title.value = "";
       price.value = 0;
-      quantity.value = 1;
+      quantity.value = kidsCount.value;
       amount.value = 0;
     };
 
     // fill inputs from repository, if id exists
-    onMounted(async () => {
+    onMounted(() => {
       if (id.value) {
-        const planItem = await findPlan(id.value);
+        const planItem = getPlanById(id.value);
         title.value = planItem.title;
-        price.value = planItem.price;
-        quantity.value = planItem.quantity;
-        amount.value = planItem.amount;
+        price.value = parseFloat(planItem.price);
+        quantity.value = parseFloat(planItem.quantity);
+        amount.value = parseFloat(planItem.amount);
       } else {
         clearForm();
       }
     });
 
     // submit form action
-    const formSubmit = () => {
-      const data = new FormData();
-      data.append("title", title.value);
-      data.append("price", price.value);
-      data.append("quantity", quantity.value);
-      data.append("amount", amount.value);
-      data.append("periodId", periodId.value);
+    const formSubmit = (evt) => {
+      const data = new FormData(evt.target);
+      data.append("period_id", periodId.value);
       if (id.value) {
-        // edit
-        editPlan({ id: id.value, data }).then(router.go(-1));
+        // edit || copy
+        if (mode.value == "copy") {
+          store
+            .dispatch("plans/copyPlan", { id: id.value, data })
+            .then(router.go(-1));
+        } else {
+          store
+            .dispatch("plans/editPlan", { id: id.value, data })
+            .then(router.go(-1));
+        }
       } else {
         // insert
-        addPlan({ data }).then(router.go(-1));
+        store.dispatch("plans/addPlan", { data }).then(router.go(-1));
       }
     };
     // reset form action

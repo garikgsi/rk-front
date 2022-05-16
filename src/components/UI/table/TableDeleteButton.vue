@@ -7,7 +7,13 @@
     :yes-title="yesTitle"
     :no-title="noTitle"
   >
-    <q-btn icon="delete_outline" flat @click="btnClick"></q-btn>
+    <q-btn
+      :icon="icon ? 'delete_outline' : null"
+      :label="icon ? '' : 'Удалить'"
+      flat
+      :color="color"
+      @click.stop="btnClick"
+    ></q-btn>
   </app-dialog>
 </template>
 
@@ -39,6 +45,16 @@ export default {
       require: false,
       type: String,
       default: "Нет",
+    },
+    color: {
+      require: false,
+      type: String,
+      default: null,
+    },
+    icon: {
+      require: false,
+      type: Boolean,
+      default: true,
     },
   },
   setup(props, { emit }) {

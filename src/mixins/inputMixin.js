@@ -64,4 +64,9 @@ export default {
       }
     },
   },
+  methods: {
+    focusedSelection(evt) {
+      evt.target.select();
+    },
+  },
 };

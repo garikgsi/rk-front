@@ -8,7 +8,7 @@
     <app-text-input
       label="Обозначение периода"
       required
-      v-model="title"
+      v-model="name"
       v-focus
     ></app-text-input>
     <form-buttons @close="closeForm" :cancelable="false"></form-buttons>
@@ -18,8 +18,9 @@
 <script>
 import AppTextInputVue from "../UI/inputs/AppTextInput.vue";
 import periodRepository from "@/composition/periods/periodRepository";
+import periodSearch from "@/composition/periods/periodSearch";
 import { addInfo } from "@/composition/addMessage";
-import { toRefs } from "vue";
+import { toRefs, ref } from "vue";
 import FormButtonsVue from "../UI/form/FormButtons.vue";
 
 export default {
@@ -32,14 +33,19 @@ export default {
   },
   emits: ["submitted", "closed"],
   setup(props, { emit }) {
+    const { addPeriod, editPeriod, currentPeriod } = periodRepository();
+
+    const { getPeriodById } = periodSearch();
+    // period filds values
+    const name = ref("");
     const { id } = toRefs(props);
 
-    const { addPeriod, editPeriod, title } = periodRepository();
+    if (id.value) name.value = getPeriodById(id.value).name;
 
     // submit form action
     const formSubmit = () => {
       const data = new FormData();
-      data.append("title", title.value);
+      data.append("name", name.value);
       if (id.value) {
         // edit
         editPeriod({ id: id.value, data }).then((response) => {
@@ -48,16 +54,17 @@ export default {
       } else {
         // insert
         addPeriod({ data }).then((response) => {
-          addInfo(
-            `Период ${response.data.title} добавлен, но текущий период остался прежним. Вы можете изменить его в любой момент.`
-          );
+          if (currentPeriod.value.id != response.data.id)
+            addInfo(
+              `Период ${response.data.name} добавлен, но текущий период остался прежним. Вы можете изменить его в любой момент.`
+            );
           emit("submitted", response);
         });
       }
     };
     // reset form action
     const formReset = () => {
-      title.value = "";
+      name.value = "";
     };
     // close form action
     const closeForm = () => {
@@ -65,7 +72,7 @@ export default {
     };
 
     return {
-      title,
+      name,
       formSubmit,
       formReset,
       closeForm,

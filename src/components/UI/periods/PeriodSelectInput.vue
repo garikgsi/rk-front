@@ -1,8 +1,8 @@
 <template>
   <app-select-input
     label="Период"
-    :options="periods"
-    :modelValue="period"
+    :options="periodOptions"
+    :modelValue="periodValue"
     :clearable="false"
     @update:modelValue="updateValue($event)"
   ></app-select-input>
@@ -12,7 +12,7 @@
 import inputMixin from "@/mixins/inputMixin";
 import AppSelectInputVue from "../inputs/AppSelectInput.vue";
 import periodRepository from "@/composition/periods/periodRepository";
-import { ref, onMounted } from "vue";
+import { computed, onMounted } from "vue";
 
 export default {
   name: "period-select-input",
@@ -20,20 +20,32 @@ export default {
   setup() {
     const { periods, currentPeriod, changePeriod, getPeriods } =
       periodRepository();
-
-    let period = ref(currentPeriod);
-
-    const updateValue = (val) => {
-      changePeriod(val.id);
-    };
-
+    // created hook
+    // load all periods to state
     onMounted(() => {
-      getPeriods();
+      getPeriods({});
     });
 
+    const updateValue = (val) => {
+      if (val?.id != currentPeriod?.id) changePeriod(val.id);
+    };
+
     return {
-      periods,
-      period,
+      periodOptions: computed(() => {
+        return [...periods.value].map((period) => {
+          return { id: period.id, title: period.name };
+        });
+      }),
+      periodValue: computed(() => {
+        if (currentPeriod.value) {
+          return {
+            id: currentPeriod.value.id,
+            title: currentPeriod.value.name,
+          };
+        } else {
+          return null;
+        }
+      }),
       currentPeriod,
       updateValue,
     };

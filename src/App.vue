@@ -12,16 +12,14 @@
     </q-drawer>
 
     <q-page-container>
+      <app-banner v-if="lastMessage" :msg="lastMessage"></app-banner>
       <router-view />
     </q-page-container>
-
-    <app-banner v-if="lastMessage" :msg="lastMessage"></app-banner>
 
     <q-footer bordered class="bg-white text-primary">
       <q-tabs class="text-primary" align="justify">
         <q-route-tab
           :icon="menu.icon"
-          :label="menu.title"
           :to="menu.to"
           v-for="menu in footerMenu"
           :key="menu.id"

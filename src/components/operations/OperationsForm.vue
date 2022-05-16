@@ -3,11 +3,12 @@
     @submit.stop="formSubmit"
     @reset="formReset"
     class="q-gutter-md"
-    ref="planForm"
+    ref="operationsForm"
     v-focus
   >
     <app-date-input
       v-model="date_operation"
+      name="date_operation"
       label="Дата"
       hint="Дата расходной операции"
       required
@@ -15,26 +16,48 @@
 
     <plans-select-input
       label="Статья расходов"
-      required
+      :required="false"
       v-model="plan_id"
+      name="plan_id"
     ></plans-select-input>
 
     <app-text-input
       label="Комментарий"
-      :required="false"
+      :required="true"
       v-model="comment"
+      name="comment"
     ></app-text-input>
 
-    <app-money-input label="Цена" required v-model="price"></app-money-input>
+    <app-money-input
+      label="Цена"
+      required
+      v-model="price"
+      name="price"
+    ></app-money-input>
     <app-money-input
       label="Количество"
       required
       v-model="quantity"
+      name="quantity"
     ></app-money-input>
-    <app-money-input label="Сумма" required v-model="amount"></app-money-input>
+    <app-money-input
+      label="Сумма"
+      required
+      v-model="amount"
+      name="amount"
+    ></app-money-input>
+
+    <app-text-input
+      label="Ссылка на чек/накладную"
+      :required="false"
+      v-model="check_url"
+      name="check_url"
+    ></app-text-input>
 
     <app-file-input
       v-model="image"
+      v-model:url="imageUrl"
+      name="image"
       label="Чек/накладная"
       hint="Фотография отчетного документа"
     ></app-file-input>
@@ -44,9 +67,6 @@
 </template>
 
 <script>
-import { useRouter } from "vue-router";
-import { ref, toRefs } from "vue";
-import moment from "moment";
 import AppDateInputVue from "../UI/inputs/AppDateInput.vue";
 import AppTextInputVue from "@/components/UI/inputs/AppTextInput.vue";
 import AppMoneyInputVue from "@/components/UI/inputs/AppMoneyInput.vue";
@@ -55,31 +75,108 @@ import FormButtonsVue from "@/components/UI/form/FormButtons.vue";
 import PlansSelectInputVue from "../UI/plans/PlansSelectInput.vue";
 import AppFileInputVue from "../UI/inputs/AppFileInput.vue";
 
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { ref, toRefs, onMounted } from "vue";
+import moment from "moment";
+
+import currentPeriod from "@/composition/periods/currentPeriod";
+import operationSearch from "@/composition/operations/operationSearch";
+
 export default {
-  name: "operations-form",
+  // name: "operations-form",
   props: {
     id: {
       require: false,
       type: String,
       default: undefined,
     },
-    periodId: {
-      require: true,
+    mode: {
+      require: false,
       type: String,
+      default: "add",
     },
   },
   setup(props) {
     const router = useRouter();
-    // const { editPlan, addPlan, findPlan } = planRepository();
-    const { id, periodId } = toRefs(props);
-    console.log(`id=${id.value}, periodId=${periodId.value}`);
+    const store = useStore();
+    const { id, mode } = toRefs(props);
+
     let { price, quantity, amount } = priceQuantityAmount();
+    // current period
+    const { periodId } = currentPeriod();
+
+    // search by id function
+    const { getOperationById } = operationSearch();
 
     // form field values
-    const date_operation = ref(moment().format("DD.MM.YYYY"));
-    const comment = ref("");
-    const image = ref("");
-    const plan_id = ref(null);
+    let date_operation = ref(moment().format("YYYY-MM-DD"));
+    let comment = ref("");
+    let plan_id = ref(null);
+    let image = ref(null);
+    let imageUrl = ref(null);
+    let check_url = ref("");
+
+    // fill inputs empty data
+    const clearForm = () => {
+      date_operation.value = moment().format("YYYY-MM-DD");
+      comment.value = "";
+      price.value = 0;
+      quantity.value = 1;
+      amount.value = 0;
+      image.value = null;
+      plan_id.value = null;
+      check_url = "";
+    };
+
+    // fill inputs from repository, if id exists
+    onMounted(() => {
+      if (id.value) {
+        const operationItem = getOperationById(id.value);
+        date_operation.value = operationItem.date_operation;
+        comment.value = operationItem.comment;
+        price.value = parseFloat(operationItem.price);
+        quantity.value = parseFloat(operationItem.quantity);
+        amount.value = parseFloat(operationItem.amount);
+        plan_id.value = operationItem.plan_id;
+        imageUrl.value = operationItem.image;
+        check_url.value = operationItem.check_url;
+      } else {
+        clearForm();
+      }
+    });
+    // submit form action
+    const formSubmit = (evt) => {
+      // load values from form
+      const data = new FormData(evt.target);
+      if (imageUrl.value == null && !image.value) {
+        data.set("image", "");
+      }
+      // specific values from form
+      if (plan_id.value) data.set("plan_id", plan_id.value);
+      data.set("date_operation", date_operation.value);
+      data.append("period_id", periodId.value);
+      // switch method
+      if (id.value) {
+        // edit || copy
+        if (mode.value == "copy") {
+          store
+            .dispatch("operations/copyOperation", { id: id.value, data })
+            .then(router.go(-1));
+        } else {
+          store
+            .dispatch("operations/editOperation", { id: id.value, data })
+            .then(router.go(-1));
+        }
+      } else {
+        // insert
+        store.dispatch("operations/addOperation", { data }).then(router.go(-1));
+      }
+    };
+    // reset form action
+    const formReset = () => {
+      clearForm();
+    };
 
     // close form action
     const closeForm = () => {
@@ -87,15 +184,18 @@ export default {
     };
 
     return {
-      router,
       price,
       quantity,
       amount,
       date_operation,
       comment,
       image,
+      imageUrl,
+      check_url,
       plan_id,
       closeForm,
+      formSubmit,
+      formReset,
     };
   },
   components: {

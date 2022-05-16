@@ -2,7 +2,7 @@
   <q-card flat bordered>
     <q-card-section>
       <div class="row">
-        <div class="col-9">
+        <div class="col-12 col-sm-12 col-md-8 col-lg=9">
           <div class="text-h3 text-primary">
             <q-icon :name="icon" v-if="icon"></q-icon>
             {{ title }}
@@ -11,7 +11,12 @@
             {{ subTitle }}
           </div>
         </div>
-        <div class="col"><period-select-input></period-select-input></div>
+        <div
+          class="col-12 col-sm-12 col-md-4 col-lg=3"
+          v-if="showPeriodSelector"
+        >
+          <period-select-input></period-select-input>
+        </div>
       </div>
     </q-card-section>
 
@@ -43,6 +48,11 @@ export default {
       required: false,
       type: String || null,
       default: null,
+    },
+    showPeriodSelector: {
+      required: false,
+      type: Boolean,
+      default: true,
     },
   },
   components: {
