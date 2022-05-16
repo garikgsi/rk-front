@@ -2,7 +2,7 @@ import axios from "axios";
 import { addError } from "@/composition/addMessage";
 
 // url API
-const apiUrl = "http://laravel.test/api/v1";
+const apiUrl = "https://api.tcu.su/api/v1";
 
 // add default token
 const addToken = (token) =>
