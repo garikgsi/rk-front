@@ -15,9 +15,11 @@ export default {
   mutations: {
     SET_ALL(state, { data }) {
       state.all = data;
+      state.dataLoaded = true;
     },
     ADD(state, { data }) {
       state.all.push(data);
+      state.dataLoaded = true;
     },
     EDIT(state, { data }) {
       const editedItem = state.all.findIndex((row) => row.id === data.id);
@@ -25,9 +27,6 @@ export default {
     },
     SET_LOADING(state, isLoading) {
       state.loading = isLoading;
-    },
-    SET_DATA_LOADED(state, isLoaded) {
-      state.dataLoaded = isLoaded;
     },
     REMOVE(state, { id }) {
       const removedItem = state.all.findIndex((row) => row.id === id);
@@ -43,14 +42,12 @@ export default {
     // fetch data
     async getKids({ commit }, { params }) {
       commit("SET_LOADING", true);
-      commit("SET_DATA_LOADED", false);
       const response = await apiGet({ url: `kids`, params });
       commit("SET_LOADING", false);
       if (!response.isError) {
         commit("SET_ALL", {
           data: response.data,
         });
-        commit("SET_DATA_LOADED", true);
       }
       return response;
     },

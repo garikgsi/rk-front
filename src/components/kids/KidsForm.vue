@@ -51,7 +51,7 @@
       :required="false"
     ></app-date-input>
 
-    <form-buttons @close="closeForm"></form-buttons>
+    <form-buttons @close="closeForm" :closable="closable"></form-buttons>
   </q-form>
 </template>
 
@@ -79,11 +79,22 @@ export default {
       type: String,
       default: "add",
     },
+    closable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+    returnOnSubmit: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
   },
-  setup(props) {
+  emits: ["submitted"],
+  setup(props, { emit }) {
     const router = useRouter();
     const store = useStore();
-    const { id, mode } = toRefs(props);
+    const { id, mode, returnOnSubmit } = toRefs(props);
 
     // search by id function
     const { getKidById } = kidSearch();
@@ -138,15 +149,15 @@ export default {
         if (mode.value == "copy") {
           store
             .dispatch("kids/copyKid", { id: id.value, data })
-            .then(router.go(-1));
+            .then(closeForm());
         } else {
           store
             .dispatch("kids/editKid", { id: id.value, data })
-            .then(router.go(-1));
+            .then(closeForm());
         }
       } else {
         // insert
-        store.dispatch("kids/addKid", { data }).then(router.go(-1));
+        store.dispatch("kids/addKid", { data }).then(closeForm());
       }
     };
     // reset form action
@@ -156,7 +167,11 @@ export default {
 
     // close form action
     const closeForm = () => {
-      router.go(-1);
+      if (returnOnSubmit.value) {
+        router.go(-1);
+      } else {
+        emit("submitted");
+      }
     };
 
     return {

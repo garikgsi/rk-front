@@ -11,7 +11,11 @@
       v-model="name"
       v-focus
     ></app-text-input>
-    <form-buttons @close="closeForm" :cancelable="false"></form-buttons>
+    <form-buttons
+      @close="closeForm"
+      :cancelable="false"
+      :closable="closable"
+    ></form-buttons>
   </q-form>
 </template>
 
@@ -29,6 +33,11 @@ export default {
       require: false,
       type: [String, Number],
       default: undefined,
+    },
+    closable: {
+      require: false,
+      type: Boolean,
+      default: true,
     },
   },
   emits: ["submitted", "closed"],

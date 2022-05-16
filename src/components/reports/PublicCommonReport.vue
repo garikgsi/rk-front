@@ -35,23 +35,41 @@ export default {
   setup(props) {
     const { totals } = toRefs(props);
 
+    const formatTotals = computed(() => {
+      const vals = ["startDebt", "payments", "operations", "plans"];
+      let res = {};
+      for (let key of vals) {
+        if (isNaN(totals.value[key])) {
+          res[key] = 0;
+        } else {
+          res[key] = totals.value[key];
+        }
+      }
+
+      return res;
+    });
+
     const items = computed(() => {
       return [
-        { id: 0, title: "Остаток на начало:", amount: totals.value.startDebt },
-        { id: 1, title: "Всего сдано:", amount: totals.value.payments },
-        { id: 2, title: "Потрачено:", amount: -totals.value.operations },
+        {
+          id: 0,
+          title: "Остаток на начало:",
+          amount: formatTotals.value.startDebt,
+        },
+        { id: 1, title: "Всего сдано:", amount: formatTotals.value.payments },
+        { id: 2, title: "Потрачено:", amount: -formatTotals.value.operations },
         {
           id: 3,
           title: "Остаток текущий:",
           amount:
-            totals.value.startDebt +
-            totals.value.payments -
-            totals.value.operations,
+            formatTotals.value.startDebt +
+            formatTotals.value.payments -
+            formatTotals.value.operations,
         },
         {
           id: 4,
           title: "Долги (не сдано):",
-          amount: totals.value.payments - totals.value.plans,
+          amount: formatTotals.value.payments - formatTotals.value.plans,
         },
       ];
     });
@@ -75,7 +93,7 @@ export default {
       },
     ]);
 
-    return { items, columns };
+    return { items, columns, formatTotals };
   },
 };
 </script>
