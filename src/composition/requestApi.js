@@ -1,6 +1,6 @@
 import axios from "axios";
 import { addError } from "@/composition/addMessage";
-import { apiUrl } from "@/settings";
+import settings from "@/settings";
 
 // add default token
 const addToken = (token) =>
@@ -12,7 +12,7 @@ const removeToken = () =>
 // basic request
 const apiRequest = async ({ method, url, data, params = {}, token = null }) => {
   const axiosCfg = {
-    url: `${apiUrl}/${url}`,
+    url: `${settings.apiUrl}/${url}`,
     method,
     data,
     params,
