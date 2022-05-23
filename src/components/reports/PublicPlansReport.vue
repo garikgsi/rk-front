@@ -3,6 +3,7 @@
     :items="items"
     :columns="columns"
     :editable="false"
+    :addable="false"
     title="План - бюджет"
     :searchable="false"
     :hide-pagination="true"

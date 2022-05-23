@@ -4,6 +4,7 @@
     :items="items"
     :columns="columns"
     :editable="editable"
+    :addable="addable"
     :searchable="searchable"
     :hide-pagination="hidePagination"
     :total-row="totalRow"
@@ -18,7 +19,8 @@
     @add-click="addClick"
     @edit-click="editClick"
     @copy-click="copyClick"
-  ></component>
+  >
+  </component>
 </template>
 
 <script>
@@ -42,6 +44,11 @@ export default {
       type: Array,
     },
     editable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+    addable: {
       require: false,
       type: Boolean,
       default: true,

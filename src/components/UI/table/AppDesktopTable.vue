@@ -5,6 +5,7 @@
     :columns="columns"
     row-key="id"
     dense
+    square
     no-data-label="Нет данных"
     :pagination="pagination"
     :hide-pagination="hidePagination"
@@ -13,7 +14,7 @@
   >
     <template v-slot:top>
       <!-- add button -->
-      <div class="col-sm-5" v-if="editable">
+      <div class="col-sm-5" v-if="addable">
         <q-btn color="primary" @click="addClick">Добавить</q-btn>
       </div>
       <!-- title -->
@@ -128,6 +129,11 @@ export default {
       type: Array,
     },
     editable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+    addable: {
       require: false,
       type: Boolean,
       default: true,

@@ -4,7 +4,7 @@
     <q-card-section horizontal class="q-pa-sm">
       <div class="col">
         <div class="row">
-          <div class="col-3" v-if="editable">
+          <div class="col-3" v-if="addable">
             <!-- add button -->
             <q-btn
               color="primary"
@@ -15,10 +15,10 @@
             ></q-btn>
           </div>
           <!-- title -->
-          <div :class="editable ? 'col-9' : 'col-12'" v-if="title">
+          <div :class="addable ? 'col-9' : 'col-12'" v-if="title">
             <div class="text-h5 text-primary">{{ title }}</div>
           </div>
-          <div :class="title || !editable ? 'col-12' : 'col-9'">
+          <div :class="title || !addable ? 'col-12' : 'col-9'">
             <!-- search line -->
             <table-search
               v-if="searchable"
@@ -136,6 +136,12 @@ export default {
       type: Boolean,
       default: true,
     },
+    addable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+
     searchable: {
       require: false,
       type: Boolean,

@@ -3,6 +3,7 @@
     :items="items"
     :columns="columns"
     :editable="false"
+    :addable="false"
     title="Расходные операции"
     v-model:search="tableSearchString"
     :pagination="pagination"

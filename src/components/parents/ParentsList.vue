@@ -8,11 +8,22 @@
     title="Родители"
     :hide-pagination="true"
     :pagination="{ rowsPerPage: 0 }"
-    @add-click="addClick"
+    :addable="false"
     @edit-click="editClick"
     @copy-click="copyClick"
     @delete-click="deleteClick"
-  ></app-table>
+  >
+  </app-table>
+  <div class="row">
+    <div class="col q-pa-md" align="right">
+      <q-btn
+        @click="addClick"
+        label="Добавить родителя"
+        flat
+        color="primary"
+      ></q-btn>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -1,44 +1,46 @@
 <template>
   <h4 class="q-px-sm q-ma-sm">Онлайн отчет за период</h4>
-  <div class="col-12 col-sm-12 col-md-7 col-xl-8 q-pa-sm">
-    <div class="row">
-      <div class="col q-pa-sm">
-        <app-select-input
-          v-if="periods"
-          label="Период"
-          :options="periods"
-          :modelValue="period"
-          :clearable="false"
-          option-label="name"
-          @update:modelValue="changePeriod"
-        ></app-select-input>
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-7 col-xl-8 q-pa-sm">
+      <div class="row">
+        <div class="col q-pa-sm">
+          <app-select-input
+            v-if="periods"
+            label="Период"
+            :options="periods"
+            :modelValue="period"
+            :clearable="false"
+            option-label="name"
+            @update:modelValue="changePeriod"
+          ></app-select-input>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col q-pa-sm">
+          <public-operations-report
+            v-if="operations"
+            :operations="operations"
+          ></public-operations-report>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col q-pa-sm">
-        <public-operations-report
-          v-if="operations"
-          :operations="operations"
-        ></public-operations-report>
+    <div class="col-12 col-sm-12 col-md-5 col-xl-4 q-pa-sm">
+      <div class="row">
+        <div class="col q-pa-sm">
+          <public-common-report
+            :totals="totals"
+            v-if="totals"
+          ></public-common-report>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="col-12 col-sm-12 col-md-5 col-xl-4 q-pa-sm">
-    <div class="row">
-      <div class="col q-pa-sm">
-        <public-common-report
-          :totals="totals"
-          v-if="totals"
-        ></public-common-report>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col q-pa-sm">
-        <public-plans-report
-          v-if="plans"
-          :plans="plans"
-          :total="totals?.plans"
-        ></public-plans-report>
+      <div class="row">
+        <div class="col q-pa-sm">
+          <public-plans-report
+            v-if="plans"
+            :plans="plans"
+            :total="totals?.plans"
+          ></public-plans-report>
+        </div>
       </div>
     </div>
   </div>

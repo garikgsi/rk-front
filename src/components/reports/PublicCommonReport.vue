@@ -4,6 +4,7 @@
     :columns="columns"
     row-key="id"
     dense
+    square
     no-data-label="Нет данных"
     :hide-pagination="true"
     :hide-header="true"
