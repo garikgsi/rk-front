@@ -13,7 +13,7 @@ export default {
       page: 1,
       sortBy: "date_operation",
       descending: true,
-      rowsPerPage: 20,
+      rowsPerPage: 10,
     },
   },
   // getters
@@ -90,6 +90,7 @@ export default {
         commit("REMOVE", { id, periodId: getters.periodId });
         addInfo(`Запись успешно удалена`);
       }
+      return response.isError;
     },
     // create row
     async addOperation({ commit }, { data }) {
@@ -100,6 +101,7 @@ export default {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно добавлена`);
       }
+      return response.isError;
     },
     // edit row
     async editOperation({ commit }, { id, data }) {
@@ -110,6 +112,7 @@ export default {
         commit("EDIT", { data: response.data });
         addInfo(`Запись успешно изменена`);
       }
+      return response.isError;
     },
     // copy row
     async copyOperation({ commit }, { id, data }) {
@@ -120,6 +123,7 @@ export default {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно скопирована`);
       }
+      return response.isError;
     },
     // set pagination for table
     setTablePagination({ commit }, { pagination }) {

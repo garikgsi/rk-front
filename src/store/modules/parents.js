@@ -40,9 +40,9 @@ export default {
       commit("SET_LOADING", isLoading);
     },
     // fetch data
-    async getKids({ commit }, { params }) {
+    async getParents({ commit }, { params }) {
       commit("SET_LOADING", true);
-      const response = await apiGet({ url: `kids`, params });
+      const response = await apiGet({ url: `kid_parents`, params });
       commit("SET_LOADING", false);
       if (!response.isError) {
         commit("SET_ALL", {
@@ -52,9 +52,9 @@ export default {
       return response;
     },
     // remove row
-    async removeKid({ commit }, { id, params }) {
+    async removeParent({ commit }, { id, params }) {
       commit("SET_LOADING", true);
-      const response = await apiDelete({ url: `kids/${id}`, params });
+      const response = await apiDelete({ url: `kid_parents/${id}`, params });
       commit("SET_LOADING", false);
       if (!response.isError) {
         commit("REMOVE", { id });
@@ -63,9 +63,9 @@ export default {
       return response.isError;
     },
     // create row
-    async addKid({ commit }, { data }) {
+    async addParent({ commit }, { data }) {
       commit("SET_LOADING", true);
-      const response = await apiPost({ url: `kids`, data });
+      const response = await apiPost({ url: `kid_parents`, data });
       commit("SET_LOADING", false);
       if (!response.isError) {
         commit("ADD", { data: response.data });
@@ -74,9 +74,9 @@ export default {
       return response.isError;
     },
     // edit row
-    async editKid({ commit }, { id, data }) {
+    async editParent({ commit }, { id, data }) {
       commit("SET_LOADING", true);
-      const response = await apiPut({ url: `kids/${id}`, data });
+      const response = await apiPut({ url: `kid_parents/${id}`, data });
       commit("SET_LOADING", false);
       if (!response.isError) {
         commit("EDIT", { data: response.data });
@@ -85,9 +85,9 @@ export default {
       return response.isError;
     },
     // copy row
-    async copyKid({ commit }, { id, data }) {
+    async copyParent({ commit }, { id, data }) {
       commit("SET_LOADING", true);
-      const response = await apiPost({ url: `kids/${id}`, data });
+      const response = await apiPost({ url: `kid_parents/${id}`, data });
       commit("SET_LOADING", false);
       if (!response.isError) {
         commit("ADD", { data: response.data });

@@ -34,7 +34,7 @@ export default {
     },
     EDIT_PERIOD(state, { id, payload }) {
       let editedItem = state.all.findIndex((item) => item.id === id);
-      if (editedItem) {
+      if (editedItem !== -1) {
         state.all.splice(editedItem, 1, payload);
       } else {
         state.all.push(payload);

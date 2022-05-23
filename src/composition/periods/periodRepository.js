@@ -13,6 +13,7 @@ export default function periodRepository() {
   const currentPeriod = computed(() => store.getters["periods/currentPeriod"]);
   const currentPeriodId = computed(() => store.state.periods.current);
   const dataLoaded = computed(() => store.state.periods.dataLoaded);
+  const periodsCount = computed(() => periods.value.length);
 
   const { fetchPlansData } = planRepository();
   const { fetchOperationsData } = operationsRepository();
@@ -60,6 +61,10 @@ export default function periodRepository() {
     }
   };
 
+  const fetchPeriods = async () => {
+    return getPeriods({});
+  };
+
   // actions on period changed
   watch(currentPeriod, (newPeriod, oldPeriod) => {
     if (oldPeriod?.id !== newPeriod.id) {
@@ -71,11 +76,14 @@ export default function periodRepository() {
 
   return {
     periods,
+    periodsCount,
     currentPeriod,
     currentPeriodId,
     changePeriod,
     addPeriod,
     editPeriod,
     getPeriods,
+    dataLoaded,
+    fetchPeriods,
   };
 }

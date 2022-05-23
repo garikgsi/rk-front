@@ -6,8 +6,8 @@
     v-if="currentPeriod"
   >
     <template v-slot:buttons>
-      <q-btn label="Новый период" flat color="primary">
-        <q-menu v-model="showAddPeriod">
+      <q-btn label="Новый" flat color="primary">
+        <q-menu v-model="showAddPeriod" self="top middle">
           <q-card>
             <q-card-section>
               <period-form
@@ -19,9 +19,9 @@
           </q-card>
         </q-menu>
       </q-btn>
-      <q-btn label="Переименовать" flat color="primary">
-        <q-menu v-model="showEditPeriod">
-          <q-card>
+      <q-btn label="Переименовать" flat color="secondary">
+        <q-menu v-model="showEditPeriod" self="top middle">
+          <q-card class="q-ma-md" flat>
             <q-card-section>
               <period-form
                 :id="currentPeriod.id"

@@ -49,30 +49,30 @@ export default {
       if (id.value) {
         switch (mode.value) {
           case "edit": {
-            return `Редактируем профиль ребека`;
+            return `Редактируем профиль ученика`;
           }
           case "copy":
           default: {
-            return `Копируем профиль ребека`;
+            return `Копируем профиль ученика`;
           }
         }
       } else {
-        return `Создание профиля ребека`;
+        return `Создание профиля ученика`;
       }
     });
     const pageSubTitle = computed(() => {
       if (id.value) {
         switch (mode.value) {
           case "edit": {
-            return `Изменяем профиль ребека ${item.value.last_name} ${item.value.name}`;
+            return `Изменяем профиль ученика ${item.value.last_name} ${item.value.name}`;
           }
           case "copy":
           default: {
-            return `Копируем профиль ребека ${item.value.last_name} ${item.value.name}`;
+            return `Копируем профиль ученика ${item.value.last_name} ${item.value.name}`;
           }
         }
       } else {
-        return `Добавление профиля новой ребенка`;
+        return `Добавление профиля новой ученика`;
       }
     });
 

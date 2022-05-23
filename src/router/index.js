@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { checkStoredUser } from "@/composition/appAuth";
 import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/LoginView";
 import TokensView from "@/views/tokens/TokensView";
@@ -14,6 +15,7 @@ import KidsEditorVue from "@/views/kids/KidsEditorView.vue";
 import PaymentsViewVue from "@/views/payments/PaymentsView.vue";
 import PaymentsEditorViewVue from "@/views/payments/PaymentsEditorView.vue";
 import DebtViewVue from "@/views/reports/DebtView.vue";
+import ParentEditorView from "@/views/parents/ParentEditorView.vue";
 
 const routes = [
   {
@@ -88,6 +90,12 @@ const routes = [
     props: true,
   },
   {
+    path: "/parents-form/:id?",
+    name: "parents-form",
+    component: ParentEditorView,
+    props: true,
+  },
+  {
     path: "/debt",
     name: "debt",
     component: DebtViewVue,
@@ -100,13 +108,21 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // только для авторизованных действий
   const loggedIn = store.getters["user/isAuth"];
   if (to.matched.some((record) => record.meta.noAuth)) {
+    // public routes
     next();
   } else {
+    // auth routes only
     if (!loggedIn) {
-      next("/login");
+      // check save logged user
+      checkStoredUser().then((isAuth) => {
+        if (isAuth) {
+          next(to);
+        } else {
+          next({ name: "login" });
+        }
+      });
     } else {
       next();
     }

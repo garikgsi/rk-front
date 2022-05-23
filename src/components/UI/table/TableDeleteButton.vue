@@ -1,25 +1,21 @@
 <template>
-  <app-dialog
-    v-model="showDialog"
-    @select="selected"
-    :title="title"
-    :sub-title="subTitle"
-    :yes-title="yesTitle"
-    :no-title="noTitle"
-  >
-    <q-btn
-      :icon="icon ? 'delete_outline' : null"
-      :label="icon ? '' : 'Удалить'"
-      flat
-      :color="color"
-      @click.stop="btnClick"
-    ></q-btn>
-  </app-dialog>
+  <span>
+    <app-dialog
+      v-model="showDialog"
+      @select="selected"
+      :title="title"
+      :sub-title="subTitle"
+      :yes-title="yesTitle"
+      :no-title="noTitle"
+    >
+      <q-btn v-bind="buttonProps" flat @click.stop="btnClick"></q-btn>
+    </app-dialog>
+  </span>
 </template>
 
 <script>
 import AppDialogVue from "../AppDialog.vue";
-import { ref } from "vue";
+import { ref, toRefs, computed } from "vue";
 export default {
   name: "table-delete-button",
   components: {
@@ -27,7 +23,7 @@ export default {
   },
   props: {
     title: {
-      require: true,
+      require: false,
       type: String,
       default: `Подтвердите удаление`,
     },
@@ -60,6 +56,8 @@ export default {
   setup(props, { emit }) {
     const showDialog = ref(false);
 
+    const { icon, color } = toRefs(props);
+
     // button click action
     const btnClick = () => {
       showDialog.value = true;
@@ -79,7 +77,17 @@ export default {
       }
     };
 
+    const buttonProps = computed(() => {
+      let resProps = {
+        label: icon.value !== false ? null : "Удалить",
+        color: color.value || "negative",
+      };
+      if (icon.value !== false) resProps.icon = "delete";
+      return resProps;
+    });
+
     return {
+      buttonProps,
       showDialog,
       btnClick,
       selected,

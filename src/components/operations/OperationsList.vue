@@ -56,6 +56,7 @@ export default {
         align: "left",
         sortable: false,
         type: "string",
+        mobile: "title",
       },
       {
         name: "amount",
@@ -64,6 +65,7 @@ export default {
         align: "right",
         sortable: false,
         type: "money",
+        mobile: "subTitle",
       },
       {
         name: "image",
@@ -72,6 +74,7 @@ export default {
         align: "right",
         sortable: false,
         type: "image",
+        mobile: "link",
       },
       {
         name: "actions",

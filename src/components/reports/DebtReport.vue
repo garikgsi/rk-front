@@ -9,6 +9,7 @@
       paySum: totals.paySum,
       debt: totals.debt,
     }"
+    :clickable="false"
     v-model:search="tableSearchString"
     :pagination="pagination"
     @update:pagination="updatePagination"
@@ -22,12 +23,16 @@ import debtReport from "@/composition/debt/debtReport";
 import debtFilter from "@/composition/debt/debtFilter";
 import debtTotals from "@/composition/debt/debtTotals";
 import tablePagination from "@/composition/tablePagination";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 export default {
   setup() {
     const { debtData } = debtReport();
 
     const { filteredData, tableSearchString } = debtFilter(debtData);
+
+    const tableData = computed(() => {
+      return [...filteredData.value].filter((kid) => kid.debt < 0);
+    });
 
     const { totals } = debtTotals(filteredData);
 
@@ -39,6 +44,7 @@ export default {
         align: "left",
         sortable: true,
         type: "string",
+        mobile: "title",
       },
       {
         name: "planSum",
@@ -63,6 +69,7 @@ export default {
         align: "right",
         sortable: true,
         type: "money",
+        mobile: "subTitle",
       },
     ]);
 
@@ -70,7 +77,7 @@ export default {
     const { pagination, updatePagination } = tablePagination("debt");
 
     return {
-      items: filteredData,
+      items: tableData,
       columns,
       tableSearchString,
       pagination,

@@ -7,6 +7,7 @@
     no-data-label="Нет данных"
     :hide-pagination="true"
     :hide-header="true"
+    :pagination="{ rowsPerPage: 0 }"
   >
     <!-- table header -->
     <template v-slot:top>
@@ -36,7 +37,13 @@ export default {
     const { totals } = toRefs(props);
 
     const formatTotals = computed(() => {
-      const vals = ["startDebt", "payments", "operations", "plans"];
+      const vals = [
+        "startDebt",
+        "payments",
+        "operations",
+        "plans",
+        "startSaldo",
+      ];
       let res = {};
       for (let key of vals) {
         if (isNaN(totals.value[key])) {
@@ -54,7 +61,7 @@ export default {
         {
           id: 0,
           title: "Остаток на начало:",
-          amount: formatTotals.value.startDebt,
+          amount: formatTotals.value.startSaldo,
         },
         { id: 1, title: "Всего сдано:", amount: formatTotals.value.payments },
         { id: 2, title: "Потрачено:", amount: -formatTotals.value.operations },
@@ -62,6 +69,7 @@ export default {
           id: 3,
           title: "Остаток текущий:",
           amount:
+            formatTotals.value.startSaldo +
             formatTotals.value.startDebt +
             formatTotals.value.payments -
             formatTotals.value.operations,
@@ -70,6 +78,11 @@ export default {
           id: 4,
           title: "Долги (не сдано):",
           amount: formatTotals.value.payments - formatTotals.value.plans,
+        },
+        {
+          id: 5,
+          title: "Долги прошлых периодов:",
+          amount: formatTotals.value.startDebt,
         },
       ];
     });

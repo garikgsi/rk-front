@@ -11,6 +11,7 @@
       date_operation: 'ИТОГО:',
       amount: total,
     }"
+    :clickable="false"
   ></app-table>
 </template>
 
@@ -34,6 +35,7 @@ export default {
         align: "left",
         sortable: true,
         type: "date",
+        mobile: "right",
       },
       {
         name: "comment",
@@ -42,6 +44,7 @@ export default {
         align: "left",
         sortable: false,
         type: "string",
+        mobile: "title",
       },
       {
         name: "amount",
@@ -50,6 +53,7 @@ export default {
         align: "right",
         sortable: false,
         type: "money",
+        mobile: "subTitle",
       },
       {
         name: "check",
@@ -58,11 +62,13 @@ export default {
         align: "right",
         sortable: false,
         type: "image",
+        mobile: "link",
       },
     ]);
 
     const tableSearchString = ref("");
     const { operations } = toRefs(props);
+
     const items = computed(() => {
       return tableSearchString.value
         ? [...operations.value].filter(
@@ -82,10 +88,13 @@ export default {
 
     // table pagination from store
     const { pagination, updatePagination } = tablePagination("public");
+    const reportPagination = computed(() => {
+      return { ...pagination.value, ...{ rowsPerPage: 10 } };
+    });
 
     return {
       columns,
-      pagination,
+      pagination: reportPagination,
       updatePagination,
       items,
       tableSearchString,

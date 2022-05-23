@@ -111,15 +111,21 @@ export default {
         if (mode.value == "copy") {
           store
             .dispatch("plans/copyPlan", { id: id.value, data })
-            .then(router.go(-1));
+            .then((isError) => {
+              if (!isError) closeForm();
+            });
         } else {
           store
             .dispatch("plans/editPlan", { id: id.value, data })
-            .then(router.go(-1));
+            .then((isError) => {
+              if (!isError) closeForm();
+            });
         }
       } else {
         // insert
-        store.dispatch("plans/addPlan", { data }).then(router.go(-1));
+        store.dispatch("plans/addPlan", { data }).then((isError) => {
+          if (!isError) closeForm();
+        });
       }
     };
     // reset form action

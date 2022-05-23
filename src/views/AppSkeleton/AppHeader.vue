@@ -11,13 +11,14 @@
     />
     <q-separator dark vertical inset />
     <q-btn
-      class="q-ml-sm"
+      class="q-ml-sm gt-xs"
       stretch
       flat
       size="lg"
       label="Родительский комитет"
       to="/"
-    />
+    ></q-btn>
+    <q-btn class="xs" icon="home" to="/" flat stretch></q-btn>
     <q-space></q-space>
     <q-btn-group stretch flat :round="false" outline>
       <template v-if="isAuth">

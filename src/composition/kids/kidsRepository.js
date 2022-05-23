@@ -4,7 +4,7 @@ import { computed } from "vue";
 export default function kidsRepository() {
   const store = useStore();
   // data loaded for period
-  const dataLoaded = computed(() => store.state.kids?.dataLoaded || false);
+  const kidsLoaded = computed(() => store.state.kids?.dataLoaded || false);
 
   // all operations items for period
   const kidsItems = computed(() => {
@@ -13,15 +13,17 @@ export default function kidsRepository() {
         .map((kid) => {
           return {
             ...kid,
-            ...{ fio: `${kid.last_name} ${kid.name} ${kid.patronymic}` },
+            ...{
+              fio: `${kid.last_name} ${kid.name} ${
+                kid.patronymic ? kid.patronymic : ""
+              }`,
+            },
           };
         })
         .sort((a, b) => a.fio.localeCompare(b.fio));
     }
     return [];
   });
-  // data loaded
-  const kidsLoaded = computed(() => store.state.kids.dataLoaded);
 
   // kids count
   const kidsCount = computed(() => {
@@ -40,7 +42,7 @@ export default function kidsRepository() {
 
   // fetch data for period
   const fetchKidsData = (params = {}) => {
-    if (!dataLoaded.value) {
+    if (!kidsLoaded.value) {
       store.dispatch("kids/getKids", {
         params: { ...defaultParams.value, ...params },
       });
@@ -52,6 +54,6 @@ export default function kidsRepository() {
     fetchKidsData,
     kidsLoaded,
     kidsCount,
-    dataLoaded,
+    dataLoaded: kidsLoaded,
   };
 }

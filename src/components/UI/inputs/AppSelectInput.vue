@@ -12,6 +12,7 @@
       :rules="fieldRules"
       :option-label="optionLabel"
       :option-value="optionValue"
+      :hint="hint"
       @filter="filterFn"
     />
   </div>

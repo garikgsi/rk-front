@@ -8,11 +8,19 @@ const dbFormat = ref("YYYY-MM-DD");
 
 // convert db -> user date format
 const dateUserFormat = (date) => {
-  return moment(date, dbFormat.value).format(userFormat.value);
+  try {
+    return moment(date, dbFormat.value).format(userFormat.value);
+  } catch (error) {
+    return null;
+  }
 };
 // convert user -> db date format
 const dateDbFormat = (date) => {
-  return moment(date, userFormat.value).format(dbFormat.value);
+  try {
+    return moment(date, userFormat.value).format(dbFormat.value);
+  } catch (error) {
+    return null;
+  }
 };
 
 export { dateUserFormat, dateDbFormat };

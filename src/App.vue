@@ -12,42 +12,27 @@
     </q-drawer>
 
     <q-page-container>
-      <app-banner v-if="lastMessage" :msg="lastMessage"></app-banner>
       <router-view />
     </q-page-container>
 
-    <q-footer bordered class="bg-white text-primary">
-      <q-tabs class="text-primary" align="justify">
-        <q-route-tab
-          :icon="menu.icon"
-          :to="menu.to"
-          v-for="menu in footerMenu"
-          :key="menu.id"
-        />
-      </q-tabs>
-    </q-footer>
+    <app-footer :items="footerMenu"></app-footer>
   </q-layout>
 </template>
 
 <script>
 import { computed, ref } from "vue";
 import { mapGetters, useStore } from "vuex";
-import { useRouter } from "vue-router";
-import AppBanner from "@/components/UI/AppBanner.vue";
 import AppSideBar from "@/views/AppSkeleton/SideBar.vue";
 import { checkStoredUser } from "@/composition/appAuth";
 import AppHeader from "@/views/AppSkeleton/AppHeader.vue";
+import AppFooterVue from "./views/AppFooter.vue";
 
 export default {
   setup() {
     const leftDrawerOpen = ref(false);
     // router & store
-    const router = useRouter();
+    // const router = useRouter();
     const store = useStore();
-
-    checkStoredUser().then((isAuth) => {
-      router.push(isAuth ? "/dashboard" : "/");
-    });
 
     return {
       leftDrawerOpen,
@@ -62,9 +47,9 @@ export default {
     };
   },
   components: {
-    "app-banner": AppBanner,
     "app-sidebar": AppSideBar,
     "app-header": AppHeader,
+    "app-footer": AppFooterVue,
   },
   computed: {
     ...mapGetters({

@@ -1,5 +1,4 @@
 <template>
-  <h2>Login</h2>
   <q-form
     @submit.stop="onSubmit"
     @reset="onReset"

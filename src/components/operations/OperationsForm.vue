@@ -162,15 +162,21 @@ export default {
         if (mode.value == "copy") {
           store
             .dispatch("operations/copyOperation", { id: id.value, data })
-            .then(router.go(-1));
+            .then((isError) => {
+              if (!isError) closeForm();
+            });
         } else {
           store
             .dispatch("operations/editOperation", { id: id.value, data })
-            .then(router.go(-1));
+            .then((isError) => {
+              if (!isError) closeForm();
+            });
         }
       } else {
         // insert
-        store.dispatch("operations/addOperation", { data }).then(router.go(-1));
+        store.dispatch("operations/addOperation", { data }).then((isError) => {
+          if (!isError) closeForm();
+        });
       }
     };
     // reset form action

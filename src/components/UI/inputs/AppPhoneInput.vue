@@ -1,9 +1,9 @@
 <template>
   <q-input
     filled
-    v-model.number="value"
-    type="number"
-    step="0.01"
+    v-model="value"
+    mask="+7(###)###-##-##"
+    type="text"
     :label="label"
     :hint="hint"
     lazy-rules
@@ -21,7 +21,7 @@ export default {
   props: {
     modelValue: {
       require: true,
-      type: Number || String,
+      type: String,
     },
   },
   computed: {
@@ -30,9 +30,7 @@ export default {
         return this.modelValue;
       },
       set(val) {
-        const parsedVal = parseFloat(val);
-        const res = isNaN(parsedVal) ? 0 : parsedVal;
-        this.$emit("update:modelValue", res);
+        this.$emit("update:modelValue", val);
       },
     },
 
@@ -44,7 +42,8 @@ export default {
           return [
             (v) => {
               return (
-                (!!v && !isNaN(v)) || `Поле ${this.label} должно быть заполнено`
+                (!!v && v.match(/^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/)) ||
+                "Введите телефон в формате +7(XXX)XXX-XX-XX"
               );
             },
           ];

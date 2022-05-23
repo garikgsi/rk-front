@@ -1,11 +1,19 @@
 <template>
   <div class="row">
-    <div class="col-12 col-sm-3">
-      <q-btn color="primary" :to="{ name: 'kids-form' }"
+    <div class="col-xs-2 col-sm-3 self-center">
+      <q-btn color="primary" :to="{ name: 'kids-form' }" v-if="!isPhone"
         >Добавить ребенка</q-btn
       >
+      <q-btn
+        color="primary"
+        flat
+        :to="{ name: 'kids-form' }"
+        icon="add_box"
+        size="lg"
+        v-else
+      ></q-btn>
     </div>
-    <div class="col-12 col-sm-8 q-px-md">
+    <div class="col-xs-10 col-sm-8 q-px-md">
       <table-search
         v-model="searchLine"
         :dense="false"
@@ -15,7 +23,7 @@
   </div>
   <div class="row">
     <div
-      class="col-12 col-md-6 col-lg-4 col-xl-1 q-pa-md"
+      class="col-12 col-md-6 col-lg-4 q-pa-md"
       v-for="kid in kids"
       :key="kid.id"
     >
@@ -29,11 +37,15 @@ import TableSearchVue from "../UI/table/TableSearch.vue";
 import kidsRepository from "@/composition/kids/kidsRepository";
 import { onMounted, ref, computed } from "vue";
 import KidItemVue from "./KidItem.vue";
+import screen from "@/composition/screen";
 
 export default {
   setup() {
     // kids items
     const { kidsItems, fetchKidsData } = kidsRepository();
+
+    // is phone prop
+    const { isPhone } = screen();
 
     // search line input
     const searchLine = ref("");
@@ -60,6 +72,7 @@ export default {
     return {
       kids,
       searchLine,
+      isPhone,
     };
   },
   name: "kids-list",

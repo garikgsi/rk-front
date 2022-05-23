@@ -6,10 +6,12 @@
     title="План - бюджет"
     :searchable="false"
     :hide-pagination="true"
+    :pagination="{ rowsPerPage: 0 }"
     :totalRow="{
       title: 'ИТОГО:',
       amount: total,
     }"
+    :clickable="false"
   ></app-table>
 </template>
 
@@ -40,6 +42,7 @@ export default {
         align: "left",
         sortable: false,
         type: "string",
+        mobile: "title",
       },
       {
         name: "amount",
@@ -48,6 +51,7 @@ export default {
         align: "right",
         sortable: false,
         type: "money",
+        mobile: "subTitle",
       },
     ]);
 

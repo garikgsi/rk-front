@@ -47,6 +47,7 @@ export default {
         align: "left",
         sortOrder: "ad",
         type: "date",
+        mobile: "right",
       },
       {
         name: "comment",
@@ -55,6 +56,7 @@ export default {
         align: "left",
         sortable: false,
         type: "string",
+        mobile: "title",
       },
       {
         name: "amount",
@@ -63,6 +65,7 @@ export default {
         align: "right",
         sortable: false,
         type: "money",
+        mobile: "subTitle",
       },
       {
         name: "actions",

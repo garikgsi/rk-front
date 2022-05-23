@@ -16,12 +16,14 @@
 
     <kids-select-input
       label="За кого"
-      required
+      hint="Выберите учащегося или не заполняйте, если это кэшбэк или пожертвования"
+      :required="false"
       v-model="kid_id"
     ></kids-select-input>
 
     <app-text-input
       label="Комментарий"
+      hint="Описание операции"
       :required="true"
       v-model="comment"
       name="comment"
@@ -109,7 +111,7 @@ export default {
       // load values from form
       const data = new FormData(evt.target);
       // specific values from form
-      data.set("kid_id", kid_id.value);
+      data.set("kid_id", kid_id.value ? kid_id.value : "");
       data.set("date_payment", date_payment.value);
       data.append("period_id", periodId.value);
       // switch method
@@ -118,15 +120,21 @@ export default {
         if (mode.value == "copy") {
           store
             .dispatch("payments/copyPayment", { id: id.value, data })
-            .then(router.go(-1));
+            .then((isError) => {
+              if (!isError) closeForm();
+            });
         } else {
           store
             .dispatch("payments/editPayment", { id: id.value, data })
-            .then(router.go(-1));
+            .then((isError) => {
+              if (!isError) closeForm();
+            });
         }
       } else {
         // insert
-        store.dispatch("payments/addPayment", { data }).then(router.go(-1));
+        store.dispatch("payments/addPayment", { data }).then((isError) => {
+          if (!isError) closeForm();
+        });
       }
     };
     // reset form action

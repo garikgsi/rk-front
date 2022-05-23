@@ -1,108 +1,31 @@
 <template>
-  <q-table
-    :rows="items"
+  <component
+    :is="componentName"
+    :items="items"
     :columns="columns"
-    row-key="id"
-    dense
-    no-data-label="Нет данных"
-    :pagination="pagination"
+    :editable="editable"
+    :searchable="searchable"
     :hide-pagination="hidePagination"
+    :total-row="totalRow"
+    :search="search"
+    :title="title"
+    :pagination="pagination"
+    :clickable="clickable"
     @update:pagination="updatePagination"
-    @onRowClick="rowClick"
-  >
-    <!-- add button -->
-    <template v-slot:top-left>
-      <q-toolbar align="right" v-if="editable">
-        <q-btn color="primary" @click="addClick">Добавить</q-btn>
-        <q-separator vertical inset spaced="md"></q-separator>
-      </q-toolbar>
-      <div class="text-h5 text-primary" v-if="title">{{ title }}</div>
-    </template>
-    <template v-slot:top-right>
-      <!-- search line -->
-      <table-search
-        v-if="searchable"
-        :modelValue="search"
-        @update:modelValue="searchUpdated($event)"
-      ></table-search>
-    </template>
-
-    <!-- total row -->
-    <template v-slot:bottom-row="cols" v-if="totalRow">
-      <q-tr class="total-tr">
-        <template v-for="(col, index) in cols.cols" :key="index">
-          <q-td :class="[{ 'text-right': col.align == 'right' }, 'text-h6']">
-            <!-- money -->
-
-            <div v-if="totalRow[col.name] !== undefined">
-              <div v-if="col.type == 'money'">
-                <span
-                  :class="{
-                    'text-negative': parseFloat(totalRow[col.name]) < 0,
-                  }"
-                  >{{ totalRow[col.name] }}</span
-                >
-              </div>
-              <div v-else></div>
-            </div>
-            <div v-else></div>
-          </q-td>
-        </template>
-      </q-tr>
-    </template>
-
-    <!-- row formatter -->
-    <template
-      v-for="(col, index) in columns"
-      :key="index"
-      v-slot:[`body-cell-${col.name}`]="props"
-    >
-      <q-td :props="props">
-        <!-- actions -->
-        <div v-if="col.name == 'actions'">
-          <table-edit-button @click="editClick(props.row)"></table-edit-button>
-          <table-copy-button @click="copyClick(props.row)"></table-copy-button>
-          <table-delete-button
-            :sub-title="`Действительно удаляем запись?`"
-            @submitted="deleteClick(props.row)"
-          ></table-delete-button>
-        </div>
-        <!-- images -->
-        <div v-else-if="col.type == 'image'">
-          <q-btn
-            icon="attach_file"
-            flat
-            v-if="props.row[col.name]"
-            :href="props.row[col.name]"
-            target="_blank"
-            @click.stop="clickImg"
-          ></q-btn>
-        </div>
-        <!-- date -->
-        <div v-else-if="col.type == 'date'">
-          <span>{{ formatDate(props.row[col.name]) }}</span>
-        </div>
-        <!-- money -->
-        <div v-else-if="col.type == 'money'">
-          <span
-            :class="{ 'text-negative': parseFloat(props.row[col.name]) < 0 }"
-            >{{ props.row[col.name] }}</span
-          >
-        </div>
-        <!-- other types -->
-        <div v-else>{{ props.row[col.name] }}</div>
-      </q-td>
-    </template>
-  </q-table>
+    @update:search="searchUpdated"
+    @row-click="rowClick"
+    @delete-click="deleteClick"
+    @add-click="addClick"
+    @edit-click="editClick"
+    @copy-click="copyClick"
+  ></component>
 </template>
 
 <script>
-import moment from "moment";
-
-import TableDeleteButtonVue from "@/components/UI/table/TableDeleteButton.vue";
-import TableEditButtonVue from "@/components/UI/table/TableEditButton.vue";
-import TableCopyButtonVue from "@/components/UI/table/TableCopyButton.vue";
-import TableSearchVue from "@/components/UI/table/TableSearch.vue";
+import screen from "@/composition/screen";
+import AppDesktopTableVue from "./AppDesktopTable.vue";
+import AppMobileTableVue from "./AppMobileTable.vue";
+import { toRef, computed } from "vue";
 
 export default {
   name: "app-table",
@@ -119,6 +42,11 @@ export default {
       type: Array,
     },
     editable: {
+      require: false,
+      type: Boolean,
+      default: true,
+    },
+    clickable: {
       require: false,
       type: Boolean,
       default: true,
@@ -155,17 +83,57 @@ export default {
         return { page: 1, sortBy: "id", rowsPerPage: 20 };
       },
     },
+    view: {
+      require: false,
+      type: String,
+      default: null,
+    },
   },
-  setup() {},
+  emits: [
+    "row-click",
+    "update:search",
+    "delete-click",
+    "add-click",
+    "edit-click",
+    "copy-click",
+    "update:pagination",
+  ],
+  setup(props) {
+    const { isPhone } = screen();
+
+    const view = toRef(props);
+
+    const componentName = computed(() => {
+      let component = isPhone.value ? "app-mobile-table" : "app-desktop-table";
+      if (view.value) {
+        switch (view.value) {
+          case "mobile":
+            {
+              component = "app-mobile-table";
+            }
+            break;
+          case "desktop":
+            {
+              component = "app-desktop-table";
+            }
+            break;
+        }
+      }
+      return component;
+    });
+
+    return {
+      isPhone,
+      componentName,
+    };
+  },
   components: {
-    "table-delete-button": TableDeleteButtonVue,
-    "table-edit-button": TableEditButtonVue,
-    "table-copy-button": TableCopyButtonVue,
-    "table-search": TableSearchVue,
+    "app-desktop-table": AppDesktopTableVue,
+    "app-mobile-table": AppMobileTableVue,
   },
   methods: {
     rowClick(evt, row) {
-      this.$emit("row-click", row);
+      this.$emit("row-click", evt, row);
     },
     searchUpdated(searchStr) {
       this.$emit("update:search", searchStr);
@@ -185,18 +153,8 @@ export default {
     updatePagination(pagination) {
       this.$emit("update:pagination", pagination);
     },
-    clickImg() {},
-    formatDate(val) {
-      return moment(val, "YYYY-MM-DD").format("DD.MM.YYYY");
-    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.total-tr {
-  td {
-    border-top: 1px solid grey;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

@@ -89,6 +89,7 @@ export default {
         commit("REMOVE", { id, periodId: getters.periodId });
         addInfo(`Статья расходов удалена`);
       }
+      return response.isError;
     },
     // create row
     async addPlan({ commit }, { data }) {
@@ -99,6 +100,7 @@ export default {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно добавлена`);
       }
+      return response.isError;
     },
     // edit row
     async editPlan({ commit }, { id, data }) {
@@ -109,6 +111,7 @@ export default {
         commit("EDIT", { data: response.data });
         addInfo(`Запись успешно изменена`);
       }
+      return response.isError;
     },
     // copy row
     async copyPlan({ commit }, { id, data }) {
@@ -119,6 +122,7 @@ export default {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно скопирована`);
       }
+      return response.isError;
     },
     // set pagination for table
     setTablePagination({ commit }, { pagination }) {

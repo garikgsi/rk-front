@@ -19,7 +19,11 @@
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-date v-model="value" mask="DD.MM.YYYY">
+          <q-date
+            :model-value="value"
+            mask="DD.MM.YYYY"
+            @update:modelValue="updateDate"
+          >
             <div class="row">
               <div class="col">
                 <q-btn label="Сегодня" color="primary" flat @click="setToday" />

@@ -2,6 +2,7 @@ import axios from "axios";
 import { addError } from "@/composition/addMessage";
 
 // url API
+// const apiUrl = "http://laravel.test/api/v1";
 const apiUrl = "https://api.tcu.su/api/v1";
 
 // add default token
@@ -18,7 +19,7 @@ const apiRequest = async ({ method, url, data, params = {}, token = null }) => {
     method,
     data,
     params,
-    timeout: 3000,
+    timeout: 10000,
     headers: {
       post: {
         "Content-Type": "application/x-www-form-urlencoded",
