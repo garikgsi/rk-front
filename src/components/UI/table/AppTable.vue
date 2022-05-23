@@ -140,7 +140,7 @@ export default {
   },
   methods: {
     rowClick(evt, row) {
-      this.$emit("row-click", evt, row);
+      if (this.clickable) this.$emit("row-click", evt, row);
     },
     searchUpdated(searchStr) {
       this.$emit("update:search", searchStr);

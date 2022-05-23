@@ -10,7 +10,7 @@
     :pagination="pagination"
     :hide-pagination="hidePagination"
     @update:pagination="updatePagination"
-    @onRowClick="rowClick"
+    @row-click="rowClick"
   >
     <template v-slot:top>
       <!-- add button -->
@@ -195,7 +195,7 @@ export default {
   },
   methods: {
     rowClick(evt, row) {
-      if (this.clickable) this.$emit("row-click", row);
+      this.$emit("row-click", evt, row);
     },
     searchUpdated(searchStr) {
       this.$emit("update:search", searchStr);
