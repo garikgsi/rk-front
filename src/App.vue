@@ -23,7 +23,7 @@
 import { computed, ref } from "vue";
 import { mapGetters, useStore } from "vuex";
 import AppSideBar from "@/views/AppSkeleton/SideBar.vue";
-import { checkStoredUser } from "@/composition/appAuth";
+import { checkStoredUser } from "@/composition/auth/appAuth";
 import AppHeader from "@/views/AppSkeleton/AppHeader.vue";
 import AppFooterVue from "./views/AppFooter.vue";
 

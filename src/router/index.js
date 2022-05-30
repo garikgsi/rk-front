@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { checkStoredUser } from "@/composition/appAuth";
+import { checkStoredUser } from "@/composition/auth/appAuth";
 import HomeView from "@/views/HomeView.vue";
-import LoginView from "@/views/LoginView";
+import LoginView from "@/views/auth/LoginView";
 import TokensView from "@/views/tokens/TokensView";
 import store from "@/store";
 import DashboardVue from "@/views/Dashboard.vue";
@@ -16,6 +16,10 @@ import PaymentsViewVue from "@/views/payments/PaymentsView.vue";
 import PaymentsEditorViewVue from "@/views/payments/PaymentsEditorView.vue";
 import DebtViewVue from "@/views/reports/DebtView.vue";
 import ParentEditorView from "@/views/parents/ParentEditorView.vue";
+import RegisterViewVue from "@/views/auth/RegisterView.vue";
+import RestorePasswordVue from "@/views/auth/RestorePasswordView.vue";
+import VerifyViewVue from "@/views/auth/VerifyView.vue";
+import AcceptInviteVue from "@/views/auth/AcceptInviteView.vue";
 
 const routes = [
   {
@@ -29,6 +33,32 @@ const routes = [
     name: "login",
     component: LoginView,
     meta: { noAuth: true },
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: RegisterViewVue,
+    meta: { noAuth: true },
+  },
+  {
+    path: "/restore_password",
+    name: "restore_password",
+    component: RestorePasswordVue,
+    meta: { noAuth: true },
+  },
+  {
+    path: "/verify",
+    name: "verify",
+    component: VerifyViewVue,
+    meta: { noAuth: true },
+    props: true,
+  },
+  {
+    path: "/accept_invite/:email/:code",
+    name: "acceptInvite",
+    component: AcceptInviteVue,
+    meta: { noAuth: true },
+    props: true,
   },
   {
     path: "/dashboard",

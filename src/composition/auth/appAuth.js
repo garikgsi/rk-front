@@ -1,19 +1,18 @@
 import store from "@/store";
-import { addInfo } from "./addMessage";
-import { apiPost, apiGet, addToken, removeToken } from "./requestApi";
-import { addError } from "./addMessage";
+import { addInfo } from "../addMessage";
+import { apiPost, apiGet, addToken, removeToken } from "../requestApi";
 import {
   storageAdd,
   storageHas,
   storageRemove,
   storageGet,
-} from "./localStorage";
+} from "../localStorage";
 
 // logout from app
 const logOut = () => {
   store.dispatch("user/logOut");
   storageRemove("user");
-  addInfo("You are successfully logged out");
+  addInfo("Вы вышли");
 };
 
 // auth by email & password
@@ -28,18 +27,15 @@ const logIn = async ({ email, password, saveLogged }) => {
     data: requestData,
   });
 
-  const { data, isError, error } = response;
-  if (isError) {
-    addError(error);
-    return false;
-  } else {
+  const { data, isError } = response;
+  if (!isError) {
     const userData = { email, token: data };
     store.dispatch("user/setUser", userData);
     addToken(data);
-    addInfo("You are logged in!");
+    addInfo("Вы успешно авторизованы");
     if (saveLogged) storageAdd("user", userData);
-    return true;
   }
+  return response;
 };
 
 // check if existed saved token in localStorage and use it

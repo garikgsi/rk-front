@@ -66,7 +66,11 @@ export default {
   },
   methods: {
     focusedSelection(evt) {
-      evt?.target.select();
+      try {
+        evt.target.select();
+      } catch (e) {
+        // nothing todo
+      }
     },
   },
 };

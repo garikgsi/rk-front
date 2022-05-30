@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { logOut } from "@/composition/appAuth";
+import { logOut } from "@/composition/auth/appAuth";
 import { mapGetters } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, toRefs } from "vue";

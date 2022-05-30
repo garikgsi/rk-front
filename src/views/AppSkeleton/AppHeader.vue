@@ -40,7 +40,7 @@
 import { toRefs, computed } from "vue";
 import { mapGetters } from "vuex";
 import { useRouter } from "vue-router";
-import { logOut } from "@/composition/appAuth";
+import { logOut } from "@/composition/auth/appAuth";
 
 export default {
   props: {

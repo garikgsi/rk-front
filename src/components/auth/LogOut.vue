@@ -1,14 +1,14 @@
 <template>
-  <h2>You've been already logged in</h2>
+  <h2>Вы уже авторизованы</h2>
   <q-form @submit="logOut" class="q-gutter-md">
     <div>
-      <q-btn label="Log out" type="submit" color="primary" />
+      <q-btn label="Выйти" type="submit" color="primary" />
     </div>
   </q-form>
 </template>
 
 <script>
-import { logOut } from "@/composition/appAuth";
+import { logOut } from "@/composition/auth/appAuth";
 
 export default {
   name: "login-form",
