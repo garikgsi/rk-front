@@ -1,15 +1,21 @@
 import { useStore } from "vuex";
 import { computed } from "vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
 
 export default function kidsRepository() {
   const store = useStore();
+  // current organization
+  const { organizationId } = currentOrganization();
+
   // data loaded for period
-  const kidsLoaded = computed(() => store.state.kids?.dataLoaded || false);
+  const kidsLoaded = computed(
+    () => store.state.kids.dataLoaded[organizationId.value] || false
+  );
 
   // all operations items for period
   const kidsItems = computed(() => {
-    if (kidsLoaded.value) {
-      return store.state.kids.all
+    if (organizationId.value && kidsLoaded.value) {
+      return store.state.kids.all[organizationId.value]
         .map((kid) => {
           return {
             ...kid,
@@ -36,12 +42,14 @@ export default function kidsRepository() {
   // fetch data params
   const defaultParams = computed(() => {
     return {
+      filter: `organization_id eq ${organizationId.value}`,
       limit: 0,
     };
   });
 
   // fetch data for period
   const fetchKidsData = (params = {}) => {
+    // console.log(`kids loaded=${kidsLoaded.value}`);
     if (!kidsLoaded.value) {
       store.dispatch("kids/getKids", {
         params: { ...defaultParams.value, ...params },

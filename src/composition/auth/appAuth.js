@@ -17,6 +17,10 @@ const logOut = () => {
 
 // auth by email & password
 const logIn = async ({ email, password, saveLogged }) => {
+  // logout first
+  store.dispatch("user/logOut");
+  storageRemove("user");
+  // request data
   let requestData = new FormData();
   requestData.append("email", email);
   requestData.append("password", password);
@@ -28,12 +32,21 @@ const logIn = async ({ email, password, saveLogged }) => {
   });
 
   const { data, isError } = response;
+  const token = data;
   if (!isError) {
-    const userData = { email, token: data };
-    store.dispatch("user/setUser", userData);
-    addToken(data);
+    addToken(token);
+
+    const userDataResponse = await apiGet({
+      url: "auth/user",
+    });
+    const { data, isError } = userDataResponse;
+    if (!isError) {
+      const userData = { ...data, ...{ token } };
+      store.dispatch("user/setUser", userData);
+      if (saveLogged) storageAdd("user", userData);
+    }
+
     addInfo("Вы успешно авторизованы");
-    if (saveLogged) storageAdd("user", userData);
   }
   return response;
 };

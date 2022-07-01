@@ -2,7 +2,7 @@
   <app-table
     :items="items"
     :columns="columns"
-    :editable="editable"
+    :editable="editable && isAdmin"
     :searchable="false"
     :clickable="false"
     title="Родители"
@@ -13,8 +13,17 @@
     @copy-click="copyClick"
     @delete-click="deleteClick"
   >
+    <template v-slot:actions="{ row }">
+      <q-btn
+        icon="send"
+        color="positive"
+        flat
+        round
+        :to="{ name: 'invite', params: { name: row.fio, parentId: row.id } }"
+      ></q-btn>
+    </template>
   </app-table>
-  <div class="row">
+  <div class="row" v-if="isAdmin">
     <div class="col q-pa-md" align="right">
       <q-btn
         @click="addClick"
@@ -27,11 +36,12 @@
 </template>
 
 <script>
-import { computed, toRefs, ref, onMounted } from "vue";
+import { computed, toRefs, onMounted } from "vue";
 import parentRepository from "@/composition/parents/parentsRepository";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import AppTableVue from "../UI/table/AppTable.vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
 
 export default {
   name: "parents-list",
@@ -52,40 +62,57 @@ export default {
     // router
     const router = useRouter();
 
-    const { kidId } = toRefs(props);
+    // admin permissions
+    const { isAdmin } = currentOrganization();
+
+    const { kidId, editable } = toRefs(props);
 
     // parents repo
     const { fetchParentsData, kidParents, dataLoaded } = parentRepository();
 
     // table columns
-    const columns = ref([
-      {
-        name: "fio",
-        field: "fio",
-        label: "ФИО",
-        align: "left",
-        sortable: false,
-        type: "string",
-        mobile: "title",
-      },
-      {
-        name: "phone",
-        field: "phone",
-        label: "Телефон",
-        align: "left",
-        sortable: false,
-        type: "string",
-        mobile: "subTitle",
-      },
-      {
-        name: "actions",
-        field: "actions",
-        label: "",
-        align: "right",
-        sortable: false,
-        type: "actions",
-      },
-    ]);
+    const columns = computed(() => {
+      let columns = [
+        {
+          name: "fio",
+          field: "fio",
+          label: "ФИО",
+          align: "left",
+          sortable: false,
+          type: "string",
+          mobile: "title",
+        },
+        {
+          name: "phone",
+          field: "phone",
+          label: "Телефон",
+          align: "left",
+          sortable: false,
+          type: "string",
+          mobile: "subTitle",
+        },
+        {
+          name: "email",
+          field: "email",
+          label: "Email",
+          align: "left",
+          sortable: false,
+          type: "string",
+          mobile: "subTitle",
+        },
+      ];
+      if (isAdmin.value && editable.value) {
+        columns.push({
+          name: "actions",
+          field: "actions",
+          label: "",
+          align: "right",
+          sortable: false,
+          type: "actions",
+        });
+      }
+      return columns;
+    });
 
     // fetch data on mounting
     onMounted(() => {
@@ -134,6 +161,7 @@ export default {
       editClick,
       copyClick,
       deleteClick,
+      isAdmin,
     };
   },
   components: {

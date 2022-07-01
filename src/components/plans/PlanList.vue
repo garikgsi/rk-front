@@ -1,18 +1,23 @@
 <template>
-  <app-table
-    :items="items"
-    :columns="columns"
-    :editable="true"
-    :totalRow="{ title: 'ИТОГО:', amount: totalAmount }"
-    v-model:search="tableSearchString"
-    :pagination="pagination"
-    @update:pagination="updatePagination"
-    @row-click="rowClick"
-    @add-click="addClick"
-    @edit-click="editClick"
-    @copy-click="copyClick"
-    @delete-click="deleteClick"
-  ></app-table>
+  <organization-require
+    title="Выберите учебное учреждение для которого показать запланированные расходы"
+  >
+    <app-table
+      :items="items"
+      :columns="columns"
+      :editable="isAdmin"
+      :addable="isAdmin"
+      :totalRow="{ title: 'ИТОГО:', amount: totalAmount }"
+      v-model:search="tableSearchString"
+      :pagination="pagination"
+      @update:pagination="updatePagination"
+      @row-click="rowClick"
+      @add-click="addClick"
+      @edit-click="editClick"
+      @copy-click="copyClick"
+      @delete-click="deleteClick"
+    ></app-table>
+  </organization-require>
 </template>
 
 <script>
@@ -25,11 +30,14 @@ import { useRouter } from "vue-router";
 import currentPeriod from "@/composition/periods/currentPeriod";
 import planRepository from "@/composition/plans/planRepository";
 import tablePagination from "@/composition/tablePagination";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
 
 export default {
   name: "plan-list",
   components: {
     "app-table": AppTableVue,
+    "organization-require": OrganizationRequeryVue,
   },
 
   setup() {
@@ -37,35 +45,42 @@ export default {
     const store = useStore();
     // router
     const router = useRouter();
+    // admin permissions
+    const { isAdmin } = currentOrganization();
     // table columns
-    const columns = ref([
-      {
-        name: "title",
-        field: "title",
-        label: "Статья расходов",
-        sortable: false,
-        align: "left",
-        type: "string",
-        mobile: "title",
-      },
-      {
-        name: "amount",
-        field: "amount",
-        label: "Сумма",
-        align: "right",
-        sortable: false,
-        type: "money",
-        mobile: "subTitle",
-      },
-      {
-        name: "actions",
-        field: "actions",
-        label: "",
-        align: "right",
-        sortable: false,
-        type: "actions",
-      },
-    ]);
+    const columns = computed(() => {
+      let columns = [
+        {
+          name: "title",
+          field: "title",
+          label: "Статья расходов",
+          sortable: false,
+          align: "left",
+          type: "string",
+          mobile: "title",
+        },
+        {
+          name: "amount",
+          field: "amount",
+          label: "Сумма",
+          align: "right",
+          sortable: false,
+          type: "money",
+          mobile: "subTitle",
+        },
+      ];
+      if (isAdmin.value) {
+        columns.push({
+          name: "actions",
+          field: "actions",
+          label: "",
+          align: "right",
+          sortable: false,
+          type: "actions",
+        });
+      }
+      return columns;
+    });
     // current period
     const { periodId } = currentPeriod();
     // all plans data for period
@@ -166,6 +181,7 @@ export default {
       addClick,
       editClick,
       copyClick,
+      isAdmin,
     };
   },
 };

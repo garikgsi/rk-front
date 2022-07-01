@@ -29,6 +29,8 @@ export default function restore() {
       store.dispatch("user/setUser", { email, name, token });
       addToken(token);
       addInfo("Пароль успешно изменен");
+      const userData = { ...data, ...{ token } };
+      store.dispatch("user/setUser", userData);
       storageAdd("user", data);
     }
     return response;

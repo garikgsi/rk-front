@@ -1,116 +1,62 @@
 <template>
-  <h4 class="q-px-sm q-ma-sm">Онлайн отчет за период</h4>
-  <div class="row">
-    <div class="col-12 col-sm-12 col-md-7 col-xl-8 q-pa-sm">
-      <div class="row">
-        <div class="col q-pa-sm">
-          <app-select-input
-            v-if="periods"
-            label="Период"
-            :options="periods"
-            :modelValue="period"
-            :clearable="false"
-            option-label="name"
-            @update:modelValue="changePeriod"
-          ></app-select-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col q-pa-sm">
-          <public-operations-report
-            v-if="operations"
-            :operations="operations"
-          ></public-operations-report>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-5 col-xl-4 q-pa-sm">
-      <div class="row">
-        <div class="col q-pa-sm">
-          <public-common-report
-            :totals="totals"
-            v-if="totals"
-          ></public-common-report>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col q-pa-sm">
-          <public-plans-report
-            v-if="plans"
-            :plans="plans"
-            :total="totals?.plans"
-          ></public-plans-report>
-        </div>
-      </div>
-    </div>
+  <div class="q-px-sm q-ma-sm">
+    <h1 class="text-primary">Родительский комитет</h1>
+    <p class="subtitle1">
+      Онлайн-сервис контроля своевременного внесения оплаты в родительский
+      комитет и прозрачные отчеты по тратам для родителей учащихся.
+    </p>
+    <h2>Для кого этот сервис</h2>
+    <p class="subtitle2">
+      Сервис предлагает простой инструмент для учета взносов и контроля трат,
+      поэтому будет интересен всем участникам процесса
+    </p>
+    <h2>Как пользоваться сервисом</h2>
+    <p class="subtitle2">
+      В целях безопасности в сервисе предусмотрено разделение прав доступа:
+      администраторы и обычные пользователи. Администраторы могут добавлять
+      приходные и расходные операции, осуществлять планирование и т.д.
+    </p>
+    <p class="subtitle2">
+      Обычные пользователи могут управлять своим профилем и просматривать
+      созданные администратором записи. Для тех, кто не желает регистрироваться
+      существует возможность просмотреть публичную часть отчета, которая
+      доступна по ссылке в режиме он-лайн. Ссылку к отчету может предоставить
+      любой зарегистрированный пользователь или администратор.
+    </p>
+    <h2>Как зарегистрироваться</h2>
+    <p class="subtitle2">
+      В настоящий момент сервис закрыт для публичной регистрации, для
+      регистрации необходимо приглашение от уже зарегистрированного
+      администратора.
+    </p>
   </div>
 </template>
 
 <script>
-import PublicOperationsReportVue from "@/components/reports/PublicOperationsReport.vue";
-import PublicPlansReportVue from "@/components/reports/PublicPlansReport.vue";
-import AppSelectInputVue from "@/components/UI/inputs/AppSelectInput.vue";
-import PublicCommonReportVue from "@/components/reports/PublicCommonReport.vue";
-import { onMounted, computed } from "vue";
-import { useStore } from "vuex";
+import { useMeta } from "quasar";
 export default {
   name: "home-view",
   setup() {
-    // vuex store
-    const store = useStore();
-    // current period
-    const period = computed(() => store.state.public.period);
-    // all periods
-    const periods = computed(() => store.state.public.periods);
-    // data loaded for period property
-    const dataLoaded = computed(() => {
-      return store.state.public.dataLoaded[period.value?.id] || false;
+    useMeta(() => {
+      return {
+        title: `Родительский комитет: сервис учета взносов и контроля трат`,
+        meta: {
+          description: {
+            name: "description",
+            content:
+              "Онлайн-сервис для родительского комитета: учет взносов, контроль трат и доступный в реальном времени публичный отчет",
+          },
+          keywords: {
+            name: "keywords",
+            content: "Родительский комитет, расходы, учет, отчет",
+          },
+          equiv: {
+            "http-equiv": "Content-Type",
+            content: "text/html; charset=UTF-8",
+          },
+        },
+      };
     });
-    // change current period action
-    const changePeriod = async (newPeriod) => {
-      store.dispatch("public/changePeriod", newPeriod.id);
-      fetchData();
-    };
-    // fetch data for period function
-    const fetchData = () => {
-      if (!dataLoaded.value)
-        store.dispatch("public/getReport", period.value?.id);
-    };
-    // operations for period
-    const operations = computed(() => {
-      return period.value?.id
-        ? store.state.public.operations[period.value.id]
-        : [];
-    });
-    // plans for period
-    const plans = computed(() => {
-      return period.value?.id ? store.state.public.plans[period.value.id] : [];
-    });
-
-    // totals for period
-    const totals = computed(() => {
-      return period.value?.id ? store.state.public.totals[period.value.id] : [];
-    });
-
-    onMounted(() => {
-      fetchData();
-    });
-
-    return {
-      dataLoaded,
-      changePeriod,
-      period,
-      periods,
-      operations,
-      plans,
-      totals,
-    };
-  },
-  components: {
-    "public-operations-report": PublicOperationsReportVue,
-    "public-plans-report": PublicPlansReportVue,
-    "public-common-report": PublicCommonReportVue,
-    "app-select-input": AppSelectInputVue,
   },
 };
 </script>

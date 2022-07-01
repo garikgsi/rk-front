@@ -5,7 +5,8 @@ export default function paymentSearch() {
 
   const getPaymentById = (id) => {
     if (paymentsItems.value) {
-      return [...paymentsItems.value].find((item) => item.id == id);
+      const payment = [...paymentsItems.value].find((item) => item.id == id);
+      if (payment) return { ...payment };
     }
     return null;
   };

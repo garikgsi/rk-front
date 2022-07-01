@@ -77,7 +77,7 @@ export default {
         },
         {
           id: 4,
-          title: "Долги (не сдано):",
+          title: "Долг - отрицательное значение:",
           amount: formatTotals.value.payments - formatTotals.value.plans,
         },
         {

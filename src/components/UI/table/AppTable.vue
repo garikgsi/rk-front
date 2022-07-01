@@ -20,6 +20,9 @@
     @edit-click="editClick"
     @copy-click="copyClick"
   >
+    <template v-slot:actions="{ row }">
+      <slot name="actions" :row="row"></slot>
+    </template>
   </component>
 </template>
 

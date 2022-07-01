@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import moment from "moment";
+import { dateUserFormat } from "@/composition/dates";
 import { useRouter } from "vue-router";
 import { ref, toRefs, onMounted } from "vue";
 
@@ -55,9 +55,7 @@ export default {
         if (item.value.kid_id)
           item.value.kid = getKidById(item.value.kid_id)?.fio;
         if (item.value.date_payment)
-          item.value.date_payment = moment(item.value.date_payment).format(
-            "DD.MM.YYYY"
-          );
+          item.value.date_payment = dateUserFormat(item.value.date_payment);
       }
     });
     // close form action

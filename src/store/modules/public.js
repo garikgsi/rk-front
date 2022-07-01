@@ -4,11 +4,12 @@ export default {
   namespaced: true,
   // store
   state: {
+    slug: null,
     plans: {},
     operations: {},
     totals: {},
-    period: null,
-    periods: [],
+    period: {},
+    periods: {},
     loading: false,
     dataLoaded: {},
     tablePagination: {
@@ -21,28 +22,55 @@ export default {
   // getters
   getters: {
     periodId(state) {
-      return state.period ? state.period.id : null;
+      return state.period[state.slug] ? state.period[state.slug]?.id : null;
+    },
+    slug(state) {
+      return state.slug;
     },
   },
   // muattions
   mutations: {
     SET_ALL(state, { data }) {
       if (data.current_period) {
-        state.period = data.current_period;
+        state.period[state.slug] = data.current_period;
+        let dataLoaded = false;
         if (data.plans && data.operations && data.totals) {
-          state.plans[data.current_period.id] = data.plans;
-          state.operations[data.current_period.id] = data.operations;
-          state.totals[data.current_period.id] = data.totals;
-          state.dataLoaded[data.current_period.id] = true;
-        } else {
-          state.dataLoaded[data.current_period.id] = false;
+          // plans
+          if (state.plans[state.slug])
+            state.plans[state.slug][data.current_period.id] = data.plans;
+          else
+            state.plans[state.slug] = { [data.current_period.id]: data.plans };
+          // operations
+          if (state.operations[state.slug])
+            state.operations[state.slug][data.current_period.id] =
+              data.operations;
+          else
+            state.operations[state.slug] = {
+              [data.current_period.id]: data.operations,
+            };
+          // totals
+          if (state.totals[state.slug])
+            state.totals[state.slug][data.current_period.id] = data.totals;
+          else
+            state.totals[state.slug] = {
+              [data.current_period.id]: data.totals,
+            };
+          dataLoaded = true;
         }
-        state.periods = data?.periods;
+        // is data loaded
+        if (state.dataLoaded[state.slug])
+          state.dataLoaded[state.slug][data.current_period.id] = dataLoaded;
+        else
+          state.dataLoaded[state.slug] = {
+            [data.current_period.id]: dataLoaded,
+          };
+        // periods list
+        state.periods[state.slug] = data?.periods;
       }
     },
     CHANGE_PERIOD(state, periodId) {
-      if (state.periods) {
-        return (state.period = state.periods.find(
+      if (state.periods[state.slug]) {
+        return (state.period[state.slug] = state.periods[state.slug].find(
           (period) => period.id == periodId
         ));
       }
@@ -52,27 +80,36 @@ export default {
       state.loading = isLoading;
     },
     SET_DATA_LOADED(state, { isLoaded, periodId }) {
-      state.dataLoaded[periodId] = isLoaded;
+      state.dataLoaded[state.slug][periodId] = isLoaded;
     },
     SET_TABLE_PAGINATION(state, { pagination }) {
       state.tablePagination = pagination;
+    },
+    SET_SLUG(state, slug) {
+      state.slug = slug;
     },
   },
   // actions
   actions: {
     // loading action
     setLoading({ commit }, isLoading) {
+      commit("app/SET_LOADING", isLoading, { root: true });
       commit("SET_LOADING", isLoading);
+    },
+    async setSlug({ commit }, slug) {
+      return commit("SET_SLUG", slug);
     },
     async changePeriod({ commit }, periodId) {
       return commit("CHANGE_PERIOD", periodId);
     },
     // fetch data
-    async getReport({ commit }, periodId = null) {
-      commit("SET_LOADING", true);
-      const url = `report/public${periodId ? `/${periodId}` : ""}`;
+    async getReport({ commit, getters, dispatch }, periodId = null) {
+      dispatch("setLoading", true);
+      const url = `report/public/${getters.slug}${
+        periodId ? `/${periodId}` : ""
+      }`;
       const response = await apiGet({ url });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("SET_ALL", {
           data: response.data,

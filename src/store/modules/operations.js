@@ -1,6 +1,7 @@
 import { apiGet, apiDelete, apiPost, apiPut } from "@/composition/requestApi";
 import { addInfo } from "@/composition/addMessage";
 import periodStore from "./periods";
+import organizationStore from "./organizations";
 
 export default {
   namespaced: true,
@@ -19,7 +20,7 @@ export default {
   // getters
   getters: {
     periodId() {
-      return periodStore.state.current;
+      return periodStore.state.current[organizationStore.state.current];
     },
   },
   // muattions
@@ -58,17 +59,18 @@ export default {
   actions: {
     // loading action
     setLoading({ commit }, isLoading) {
+      commit("app/SET_LOADING", isLoading, { root: true });
       commit("SET_LOADING", isLoading);
     },
     // fetch data
-    async getOperations({ commit, getters }, { params }) {
-      commit("SET_LOADING", true);
+    async getOperations({ commit, getters, dispatch }, { params }) {
+      dispatch("setLoading", true);
       commit("SET_DATA_LOADED", {
         isLoaded: false,
         periodId: getters.periodId,
       });
       const response = await apiGet({ url: `operations`, params });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("SET_ALL", {
           data: response.data,
@@ -82,10 +84,10 @@ export default {
       return response;
     },
     // remove row
-    async removeOperation({ commit, getters }, { id, params }) {
-      commit("SET_LOADING", true);
+    async removeOperation({ commit, getters, dispatch }, { id, params }) {
+      dispatch("setLoading", true);
       const response = await apiDelete({ url: `operations/${id}`, params });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("REMOVE", { id, periodId: getters.periodId });
         addInfo(`Запись успешно удалена`);
@@ -93,10 +95,10 @@ export default {
       return response.isError;
     },
     // create row
-    async addOperation({ commit }, { data }) {
-      commit("SET_LOADING", true);
+    async addOperation({ commit, dispatch }, { data }) {
+      dispatch("setLoading", true);
       const response = await apiPost({ url: `operations`, data });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно добавлена`);
@@ -104,10 +106,10 @@ export default {
       return response.isError;
     },
     // edit row
-    async editOperation({ commit }, { id, data }) {
-      commit("SET_LOADING", true);
+    async editOperation({ commit, dispatch }, { id, data }) {
+      dispatch("setLoading", true);
       const response = await apiPut({ url: `operations/${id}`, data });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("EDIT", { data: response.data });
         addInfo(`Запись успешно изменена`);
@@ -115,10 +117,10 @@ export default {
       return response.isError;
     },
     // copy row
-    async copyOperation({ commit }, { id, data }) {
-      commit("SET_LOADING", true);
+    async copyOperation({ commit, dispatch }, { id, data }) {
+      dispatch("setLoading", true);
       const response = await apiPost({ url: `operations/${id}`, data });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно скопирована`);

@@ -57,13 +57,24 @@
             </div>
 
             <div class="col float-right" v-if="editable">
-              <table-edit-button @click="editClick(item)"></table-edit-button>
-              <table-copy-button @click="copyClick(item)"></table-copy-button>
+              <table-edit-button
+                @click="editClick(item)"
+                round
+                flat
+              ></table-edit-button>
+              <table-copy-button
+                @click="copyClick(item)"
+                round
+                flat
+              ></table-copy-button>
               <table-delete-button
                 :sub-title="`Действительно удаляем запись?`"
+                round
+                flat
                 @submitted="deleteClick(item)"
               ></table-delete-button>
             </div>
+            <slot name="actions" :row="props.row"></slot>
           </div>
         </q-expansion-item>
         <q-item v-else>

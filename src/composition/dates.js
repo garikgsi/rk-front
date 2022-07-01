@@ -19,6 +19,7 @@ const dateDbFormat = (date) => {
   try {
     return moment(date, userFormat.value).format(dbFormat.value);
   } catch (error) {
+    console.log(`wrong date`);
     return null;
   }
 };

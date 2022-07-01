@@ -8,7 +8,13 @@
       :yes-title="yesTitle"
       :no-title="noTitle"
     >
-      <q-btn v-bind="buttonProps" flat @click.stop="btnClick"></q-btn>
+      <q-btn
+        v-bind="buttonProps"
+        :color="color"
+        :flat="flat"
+        :round="round"
+        @click.stop="btnClick"
+      ></q-btn>
     </app-dialog>
   </span>
 </template>
@@ -43,14 +49,24 @@ export default {
       default: "Нет",
     },
     color: {
-      require: false,
       type: String,
-      default: null,
+      require: false,
+      default: "negative",
+    },
+    round: {
+      type: Boolean,
+      require: false,
+      default: false,
     },
     icon: {
       require: false,
       type: Boolean,
       default: true,
+    },
+    flat: {
+      type: Boolean,
+      require: false,
+      default: false,
     },
   },
   setup(props, { emit }) {

@@ -22,20 +22,43 @@
 import AppDashboardWidgetVue from "@/views/AppSkeleton/AppDashboardWidget.vue";
 import planRepository from "@/composition/plans/planRepository";
 import kidsRepository from "@/composition/kids/kidsRepository";
-
-import { onMounted, computed } from "vue";
+import { onMounted, computed, ref } from "vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import currentPeriod from "@/composition/periods/currentPeriod";
 
 export default {
   name: "plans-widget",
   setup() {
     const { fetchPlansData, sumPlans } = planRepository();
     const { kidsCount, fetchKidsData } = kidsRepository();
+    // admin permissions
+    const { isAdmin } = currentOrganization();
+    // widget color
+    const color = ref("primary");
+    // current period
+    const { period } = currentPeriod();
     // plans by 1 kid
     const planByKid = computed(() => {
       if (kidsCount.value > 0) {
         return Math.round(sumPlans.value / kidsCount.value);
       }
       return 0;
+    });
+
+    const buttons = computed(() => {
+      let buttons = [
+        { title: "Список", to: { name: "plans" }, color: "primary" },
+      ];
+      if (isAdmin.value)
+        buttons.push({
+          title: "Добавить",
+          to: {
+            name: "plan-form",
+            params: { periodId: period.value.id },
+          },
+          color: "positive",
+        });
+      return buttons;
     });
 
     onMounted(() => {
@@ -46,32 +69,13 @@ export default {
     return {
       sumPlans,
       planByKid,
+      isAdmin,
+      buttons,
+      color,
     };
   },
   components: {
     "app-dashboard-widget": AppDashboardWidgetVue,
-  },
-  data() {
-    return {
-      color: "primary",
-      currentPeriod: {
-        id: 1,
-      },
-    };
-  },
-  computed: {
-    buttons() {
-      return [
-        { title: "Список", to: { name: "plans" }, color: "primary" },
-        {
-          title: "Добавить",
-          to: {
-            name: "plan-form",
-          },
-          color: "primary",
-        },
-      ];
-    },
   },
 };
 </script>

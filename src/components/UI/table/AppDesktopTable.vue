@@ -62,30 +62,39 @@
     >
       <q-td :props="props">
         <!-- actions -->
-        <div v-if="col.name == 'actions'">
-          <div class="row">
+        <div class="row" v-if="col.name == 'actions'">
+          <template v-if="editable">
             <div class="col">
               <table-edit-button
+                round
+                flat
                 @click="editClick(props.row)"
               ></table-edit-button>
               <table-copy-button
+                round
+                flat
                 @click="copyClick(props.row)"
               ></table-copy-button>
               <table-delete-button
+                round
+                flat
                 :sub-title="`Действительно удаляем запись?`"
                 @submitted="deleteClick(props.row)"
               ></table-delete-button>
             </div>
-          </div>
+          </template>
+          <slot name="actions" :row="props.row"></slot>
         </div>
         <!-- images -->
         <div v-else-if="col.type == 'image'">
           <q-btn
             icon="attach_file"
             flat
+            round
             v-if="props.row[col.name]"
             :href="props.row[col.name]"
             target="_blank"
+            @click.stop=""
           ></q-btn>
         </div>
         <!-- date -->

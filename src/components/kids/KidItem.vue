@@ -2,91 +2,79 @@
   <q-card flat bordered square>
     <q-img v-if="kid.avatar" :src="kid.avatar" />
 
-    <q-card-section>
+    <q-card-section class="bg-primary text-white">
       <div class="text-h5 q-mt-sm">
         {{ kid.last_name }} {{ kid.name }} {{ kid.patronymic }}
       </div>
-      <div v-if="kid.end_study" class="text-overline text-grey">
-        Закончил обучение {{ dateUserFormat(kid.end_study) }}
+
+      <div class="text-subtitle2 text-blue-3 q-ma-sm">
+        <div v-if="kid.end_study">
+          Закончил обучение: {{ dateUserFormat(kid.end_study) }}
+        </div>
+        <div v-if="kid.birthday">
+          <span class="q-mt-md"
+            >День рождения: {{ dateUserFormat(kid.birthday) }}</span
+          >
+        </div>
       </div>
     </q-card-section>
 
-    <q-card-actions>
-      <template v-if="editable">
-        <div class="col-10" v-if="!isPhone">
-          <q-btn
-            class="q-mr-md"
-            color="primary"
-            label="Изменить"
-            :to="{ name: 'kids-form', params: { id: kid.id, mode: 'edit' } }"
-          />
-          <q-btn
-            class="q-mr-md"
-            color="primary"
-            label="Копировать"
-            :to="{ name: 'kids-form', params: { id: kid.id, mode: 'copy' } }"
-          />
-          <table-delete-button
-            class="q-mr-md"
-            color="negative"
-            :icon="false"
-            @submitted="deleteKid(kid.id)"
-          ></table-delete-button>
-        </div>
-        <div v-else>
-          <table-edit-button
-            :to="{ name: 'kids-form', params: { id: kid.id, mode: 'edit' } }"
-          ></table-edit-button>
-          <table-copy-button
-            :to="{ name: 'kids-form', params: { id: kid.id, mode: 'copy' } }"
-          ></table-copy-button>
-          <table-delete-button
-            :sub-title="`Действительно удаляем запись?`"
-            @submitted="deleteKid(kid.id)"
-          ></table-delete-button>
-        </div>
-      </template>
-      <div class="col" align="right">
-        <q-btn
-          color="grey"
-          round
-          flat
-          dense
-          :icon="
-            cardExpanded[kid.id] ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
-          "
-          @click="kidExpand(kid.id)"
-        ></q-btn>
-      </div>
-    </q-card-actions>
-
     <q-slide-transition>
       <div v-show="cardExpanded[kid.id]">
-        <q-separator />
-        <div class="text-subtitle1 q-ma-sm" v-if="kid.birthday">
-          <div v-if="kid.birthday">
-            <span class="q-mt-md"
-              >День рождения: {{ dateUserFormat(kid.birthday) }}</span
-            >
-          </div>
-        </div>
-
-        <q-card-section class="q-pa-none parents-section">
+        <q-card-section class="q-pa-none active-section">
           <parents-list
             :kid-id="kid.id"
             v-if="cardExpanded[kid.id]"
           ></parents-list>
+          <q-separator></q-separator>
         </q-card-section>
       </div>
     </q-slide-transition>
+
+    <q-card-section :class="{ 'active-section': cardExpanded[kid.id] }">
+      <div class="row">
+        <div class="col-8">
+          <q-btn
+            class="q-ma-xs"
+            :color="cardExpanded[kid.id] ? 'white' : 'purple'"
+            :text-color="cardExpanded[kid.id] ? 'primary' : 'white'"
+            round
+            icon="escalator_warning"
+            size="md"
+            @click="kidExpand(kid.id)"
+          ></q-btn>
+          <table-edit-button
+            class="q-ma-xs"
+            v-if="isAdmin"
+            round
+            :to="{ name: 'kids-form', params: { id: kid.id, mode: 'edit' } }"
+          ></table-edit-button>
+          <table-copy-button
+            class="q-ma-xs"
+            v-if="isAdmin"
+            round
+            :to="{ name: 'kids-form', params: { id: kid.id, mode: 'copy' } }"
+          ></table-copy-button>
+        </div>
+        <div class="col" align="right">
+          <table-delete-button
+            class="q-ma-xs"
+            v-if="isAdmin"
+            round
+            @submitted="deleteKid(kid.id)"
+          ></table-delete-button>
+        </div>
+      </div>
+    </q-card-section>
   </q-card>
 </template>
 
 <script>
-import { toRefs, ref } from "vue";
+import { toRefs, ref, computed } from "vue";
 import { useStore } from "vuex";
 import { dateUserFormat } from "@/composition/dates";
 import screen from "@/composition/screen";
+import currentOrganization from "@/composition/organizations/currentOrganization";
 
 import TableDeleteButtonVue from "@/components/UI/table/TableDeleteButton.vue";
 import TableEditButtonVue from "../UI/table/TableEditButton.vue";
@@ -113,10 +101,17 @@ export default {
     // is phone prop
     const { isPhone } = screen();
 
+    // is user == admin organization
+    const { isAdmin } = currentOrganization();
+
     const { item } = toRefs(props);
 
+    // load expanded items from store
+    const storeExpandedItems = computed(() => {
+      return store.state.kids.expanded || {};
+    });
     // expander show in kid card
-    let cardExpanded = ref({});
+    let cardExpanded = ref(storeExpandedItems);
 
     // CRUD
     // delete kid
@@ -126,6 +121,10 @@ export default {
 
     // expand kid
     const kidExpand = (kidId) => {
+      store.dispatch("kids/setExpanded", {
+        id: kidId,
+        isExpanded: !cardExpanded.value[kidId],
+      });
       cardExpanded.value[kidId] = !cardExpanded.value[kidId];
     };
 
@@ -136,6 +135,7 @@ export default {
       deleteKid,
       isPhone,
       kidExpand,
+      isAdmin,
     };
   },
   components: {
@@ -148,7 +148,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.parents-section {
-  border-left: 8px solid $primary;
+.active-section {
+  border-left: 4px solid $primary;
 }
 </style>

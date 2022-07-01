@@ -1,19 +1,23 @@
 <template>
-  <app-table
-    :items="items"
-    :columns="columns"
-    :editable="false"
-    :totalRow="{
-      fio: 'ИТОГО:',
-      planSum: totals.planSum,
-      paySum: totals.paySum,
-      debt: totals.debt,
-    }"
-    :clickable="false"
-    v-model:search="tableSearchString"
-    :pagination="pagination"
-    @update:pagination="updatePagination"
-  ></app-table>
+  <organization-require
+    title="Выберите учебное учреждение для которого показать отчет"
+  >
+    <app-table
+      :items="items"
+      :columns="columns"
+      :editable="false"
+      :totalRow="{
+        fio: 'ИТОГО:',
+        planSum: totals.planSum,
+        paySum: totals.paySum,
+        debt: totals.debt,
+      }"
+      :clickable="false"
+      v-model:search="tableSearchString"
+      :pagination="pagination"
+      @update:pagination="updatePagination"
+    ></app-table>
+  </organization-require>
 </template>
 
 <script>
@@ -23,6 +27,8 @@ import debtReport from "@/composition/debt/debtReport";
 import debtFilter from "@/composition/debt/debtFilter";
 import debtTotals from "@/composition/debt/debtTotals";
 import tablePagination from "@/composition/tablePagination";
+import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
+
 import { ref, computed } from "vue";
 export default {
   setup() {
@@ -88,6 +94,7 @@ export default {
   name: "debt-report",
   components: {
     "app-table": AppTableVue,
+    "organization-require": OrganizationRequeryVue,
   },
 };
 </script>

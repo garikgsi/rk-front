@@ -1,18 +1,23 @@
 <template>
-  <app-table
-    :items="items"
-    :columns="columns"
-    :editable="true"
-    :totalRow="{ title: 'ИТОГО:', amount: totalAmount }"
-    v-model:search="tableSearchString"
-    :pagination="pagination"
-    @update:pagination="updatePagination"
-    @row-click="rowClick"
-    @add-click="addClick"
-    @edit-click="editClick"
-    @copy-click="copyClick"
-    @delete-click="deleteClick"
-  ></app-table>
+  <organization-require
+    title="Выберите учебное учреждение для которого показать расходные операции"
+  >
+    <app-table
+      :items="items"
+      :columns="columns"
+      :editable="isAdmin"
+      :addable="isAdmin"
+      :totalRow="{ title: 'ИТОГО:', amount: totalAmount }"
+      v-model:search="tableSearchString"
+      :pagination="pagination"
+      @update:pagination="updatePagination"
+      @row-click="rowClick"
+      @add-click="addClick"
+      @edit-click="editClick"
+      @copy-click="copyClick"
+      @delete-click="deleteClick"
+    ></app-table>
+  </organization-require>
 </template>
 
 <script>
@@ -25,11 +30,14 @@ import { useRouter } from "vue-router";
 import currentPeriod from "@/composition/periods/currentPeriod";
 import operationsRepository from "@/composition/operations/operationsRepository";
 import tablePagination from "@/composition/tablePagination";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
 
 export default {
   name: "operations-list",
   components: {
     "app-table": AppTableVue,
+    "organization-require": OrganizationRequeryVue,
   },
 
   setup() {
@@ -37,54 +45,60 @@ export default {
     const store = useStore();
     // router
     const router = useRouter();
-
+    // admin permissions
+    const { isAdmin } = currentOrganization();
     // table columns
-    const columns = ref([
-      {
-        name: "date_operation",
-        field: "date_operation",
-        label: "Дата",
-        sortable: true,
-        align: "left",
-        sortOrder: "ad",
-        type: "date",
-      },
-      {
-        name: "comment",
-        field: "comment",
-        label: "Комментарий",
-        align: "left",
-        sortable: false,
-        type: "string",
-        mobile: "title",
-      },
-      {
-        name: "amount",
-        field: "amount",
-        label: "Сумма",
-        align: "right",
-        sortable: false,
-        type: "money",
-        mobile: "subTitle",
-      },
-      {
-        name: "image",
-        field: "image",
-        label: "Чек/накладная",
-        align: "right",
-        sortable: false,
-        type: "image",
-        mobile: "link",
-      },
-      {
-        name: "actions",
-        field: "actions",
-        label: "",
-        align: "right",
-        sortable: false,
-        type: "actions",
-      },
-    ]);
+    const columns = computed(() => {
+      let columns = [
+        {
+          name: "date_operation",
+          field: "date_operation",
+          label: "Дата",
+          sortable: true,
+          align: "left",
+          sortOrder: "ad",
+          type: "date",
+        },
+        {
+          name: "comment",
+          field: "comment",
+          label: "Комментарий",
+          align: "left",
+          sortable: false,
+          type: "string",
+          mobile: "title",
+        },
+        {
+          name: "amount",
+          field: "amount",
+          label: "Сумма",
+          align: "right",
+          sortable: false,
+          type: "money",
+          mobile: "subTitle",
+        },
+        {
+          name: "image",
+          field: "image",
+          label: "Чек/накладная",
+          align: "right",
+          sortable: false,
+          type: "image",
+          mobile: "link",
+        },
+      ];
+      if (isAdmin.value) {
+        columns.push({
+          name: "actions",
+          field: "actions",
+          label: "",
+          align: "right",
+          sortable: false,
+          type: "actions",
+        });
+      }
+      return columns;
+    });
 
     // current period
     const { periodId } = currentPeriod();
@@ -192,6 +206,7 @@ export default {
       addClick,
       editClick,
       copyClick,
+      isAdmin,
     };
   },
 };

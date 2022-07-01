@@ -1,35 +1,38 @@
 <template>
-  <div class="row">
-    <div class="col-xs-2 col-sm-3 self-center">
-      <q-btn color="primary" :to="{ name: 'kids-form' }" v-if="!isPhone"
-        >Добавить ребенка</q-btn
+  <organization-require>
+    <div class="row" v-if="kidsLoaded">
+      <div class="col-xs-2 col-sm-3 self-center" v-if="isAdmin">
+        <q-btn color="primary" :to="{ name: 'kids-form' }" v-if="!isPhone"
+          >Добавить ребенка</q-btn
+        >
+        <q-btn
+          color="primary"
+          flat
+          :to="{ name: 'kids-form' }"
+          icon="add_box"
+          size="lg"
+          v-else
+        ></q-btn>
+      </div>
+      <div class="col-xs-10 col-sm-8 q-px-md">
+        <table-search
+          v-model="searchLine"
+          :dense="false"
+          label="Поиск по ФИО ребенка"
+        ></table-search>
+      </div>
+    </div>
+    <app-spinner v-else></app-spinner>
+    <div class="row">
+      <div
+        class="col-12 col-md-6 col-lg-4 q-pa-md"
+        v-for="kid in kids"
+        :key="kid.id"
       >
-      <q-btn
-        color="primary"
-        flat
-        :to="{ name: 'kids-form' }"
-        icon="add_box"
-        size="lg"
-        v-else
-      ></q-btn>
+        <kid-item :item="kid"></kid-item>
+      </div>
     </div>
-    <div class="col-xs-10 col-sm-8 q-px-md">
-      <table-search
-        v-model="searchLine"
-        :dense="false"
-        label="Поиск по ФИО ребенка"
-      ></table-search>
-    </div>
-  </div>
-  <div class="row">
-    <div
-      class="col-12 col-md-6 col-lg-4 q-pa-md"
-      v-for="kid in kids"
-      :key="kid.id"
-    >
-      <kid-item :item="kid"></kid-item>
-    </div>
-  </div>
+  </organization-require>
 </template>
 
 <script>
@@ -38,14 +41,20 @@ import kidsRepository from "@/composition/kids/kidsRepository";
 import { onMounted, ref, computed } from "vue";
 import KidItemVue from "./KidItem.vue";
 import screen from "@/composition/screen";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
+import AppSpinnerVue from "../UI/AppSpinner.vue";
 
 export default {
   setup() {
     // kids items
-    const { kidsItems, fetchKidsData } = kidsRepository();
+    const { kidsItems, fetchKidsData, kidsLoaded } = kidsRepository();
 
     // is phone prop
     const { isPhone } = screen();
+
+    // is user == admin of organizations
+    const { isAdmin } = currentOrganization();
 
     // search line input
     const searchLine = ref("");
@@ -73,12 +82,16 @@ export default {
       kids,
       searchLine,
       isPhone,
+      isAdmin,
+      kidsLoaded,
     };
   },
   name: "kids-list",
   components: {
     "kid-item": KidItemVue,
     "table-search": TableSearchVue,
+    "organization-require": OrganizationRequeryVue,
+    "app-spinner": AppSpinnerVue,
   },
 };
 </script>

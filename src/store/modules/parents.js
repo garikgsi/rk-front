@@ -1,4 +1,10 @@
-import { apiGet, apiDelete, apiPost, apiPut } from "@/composition/requestApi";
+import {
+  apiGet,
+  apiDelete,
+  apiPost,
+  apiPut,
+  apiPatch,
+} from "@/composition/requestApi";
 import { addInfo } from "@/composition/addMessage";
 
 export default {
@@ -37,13 +43,14 @@ export default {
   actions: {
     // loading action
     setLoading({ commit }, isLoading) {
+      commit("app/SET_LOADING", isLoading, { root: true });
       commit("SET_LOADING", isLoading);
     },
     // fetch data
-    async getParents({ commit }, { params }) {
-      commit("SET_LOADING", true);
+    async getParents({ commit, dispatch }, { params }) {
+      dispatch("setLoading", true);
       const response = await apiGet({ url: `kid_parents`, params });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("SET_ALL", {
           data: response.data,
@@ -52,10 +59,10 @@ export default {
       return response;
     },
     // remove row
-    async removeParent({ commit }, { id, params }) {
-      commit("SET_LOADING", true);
+    async removeParent({ commit, dispatch }, { id, params }) {
+      dispatch("setLoading", true);
       const response = await apiDelete({ url: `kid_parents/${id}`, params });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("REMOVE", { id });
         addInfo(`Запись успешно удалена`);
@@ -63,10 +70,10 @@ export default {
       return response.isError;
     },
     // create row
-    async addParent({ commit }, { data }) {
-      commit("SET_LOADING", true);
+    async addParent({ commit, dispatch }, { data }) {
+      dispatch("setLoading", true);
       const response = await apiPost({ url: `kid_parents`, data });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно добавлена`);
@@ -74,10 +81,10 @@ export default {
       return response.isError;
     },
     // edit row
-    async editParent({ commit }, { id, data }) {
-      commit("SET_LOADING", true);
+    async editParent({ commit, dispatch }, { id, data }) {
+      dispatch("setLoading", true);
       const response = await apiPut({ url: `kid_parents/${id}`, data });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("EDIT", { data: response.data });
         addInfo(`Запись успешно изменена`);
@@ -85,13 +92,27 @@ export default {
       return response.isError;
     },
     // copy row
-    async copyParent({ commit }, { id, data }) {
-      commit("SET_LOADING", true);
+    async copyParent({ commit, dispatch }, { id, data }) {
+      dispatch("setLoading", true);
       const response = await apiPost({ url: `kid_parents/${id}`, data });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
       if (!response.isError) {
         commit("ADD", { data: response.data });
         addInfo(`Запись успешно скопирована`);
+      }
+      return response.isError;
+    },
+    // associated parent with user
+    async associateWithUser({ commit, dispatch }, { id, userId }) {
+      dispatch("setLoading", true);
+      // prepare data
+      const data = new FormData();
+      data.append("user_id", userId);
+      // call request
+      const response = await apiPatch({ url: `kid_parents/${id}`, data });
+      dispatch("setLoading", false);
+      if (!response.isError) {
+        commit("EDIT", { data: response.data });
       }
       return response.isError;
     },

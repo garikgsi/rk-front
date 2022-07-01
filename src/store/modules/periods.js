@@ -1,71 +1,87 @@
 import { apiPost, apiPatch, apiGet } from "@/composition/requestApi";
+import organizationStore from "./organizations";
 
 export default {
   namespaced: true,
   // store
   state: {
-    all: [],
-    current: null,
+    all: {},
+    current: {},
     loading: false,
-    dataLoaded: false,
+    dataLoaded: {},
   },
   // getters
   getters: {
-    currentPeriod(state) {
-      if (state.all && state.current) {
-        return state.all.find((period) => period.id == state.current);
-      }
-      return null;
+    organizationId() {
+      return organizationStore.state.current;
     },
   },
   // muattions
   mutations: {
-    CHANGE_PERIOD_BY_ID(state, { id }) {
-      state.current = id;
+    CHANGE_PERIOD_BY_ID(state, { id, organizationId }) {
+      state.current[organizationId] = id;
     },
-    SET_LAST_PERIOD(state) {
-      const lastPeriod = state.all.reduce((maxIndex, item) =>
-        maxIndex.id > item.id ? maxIndex : item
+    SET_LAST_PERIOD(state, organizationId) {
+      const lastPeriod = state.all[organizationId].reduce(
+        (maxIndex, item) => (maxIndex.id > item.id ? maxIndex : item),
+        0
       );
-      if (lastPeriod) state.current = lastPeriod.id;
+      if (lastPeriod) state.current[organizationId] = lastPeriod.id;
     },
-    ADD_PERIOD(state, { payload }) {
-      state.all.push(payload);
+    SET_DATA_LOADED(state, { isLoaded, organizationId }) {
+      state.dataLoaded[organizationId] = isLoaded;
     },
-    EDIT_PERIOD(state, { id, payload }) {
-      let editedItem = state.all.findIndex((item) => item.id === id);
-      if (editedItem !== -1) {
-        state.all.splice(editedItem, 1, payload);
+    SET_ALL(state, { organizationId, data }) {
+      state.all[organizationId] = data;
+    },
+
+    ADD_PERIOD(state, { data }) {
+      if (state.all[data.organization_id]) {
+        state.all[data.organization_id].push(data);
       } else {
-        state.all.push(payload);
+        state.all[data.organization_id] = [data];
       }
     },
-    SET_ALL(state, { payload }) {
-      state.all = payload;
+    EDIT(state, { data }) {
+      const editedItem = state.all[data.organization_id].findIndex(
+        (row) => row.id === data.id
+      );
+      if (editedItem !== -1) state.all[data.organization_id][editedItem] = data;
     },
     SET_LOADING(state, isLoading) {
       state.loading = isLoading;
     },
-    SET_DATA_LOADED(state, isLoaded) {
-      state.dataLoaded = isLoaded;
+    REMOVE(state, { id, organizationId }) {
+      const removedItem = state.all[organizationId].findIndex(
+        (row) => row.id === id
+      );
+      if (removedItem !== -1) state.all[organizationId].splice(removedItem, 1);
     },
   },
   // actions
   actions: {
+    // loading action
+    setLoading({ commit }, isLoading) {
+      commit("app/SET_LOADING", isLoading, { root: true });
+      commit("SET_LOADING", isLoading);
+    },
     // change current period
-    changePeriod({ commit }, { id }) {
-      commit("CHANGE_PERIOD_BY_ID", { id });
+    changePeriod({ commit, getters }, { id }) {
+      commit("CHANGE_PERIOD_BY_ID", {
+        id,
+        organizationId: getters.organizationId,
+      });
     },
     // change period to last one
-    changeLastPeriod({ commit }) {
-      commit("SET_LAST_PERIOD");
+    async changeLastPeriod({ commit, getters }) {
+      return commit("SET_LAST_PERIOD", getters.organizationId);
     },
     // add new period
-    async addPeriod({ commit }, { data }) {
+    async addPeriod({ commit, getters }, { data }) {
       const response = await apiPost({ url: "periods", data });
       if (!response.isError) {
-        commit("ADD_PERIOD", { payload: response.data });
-        commit("SET_LAST_PERIOD");
+        commit("ADD_PERIOD", { data: response.data });
+        commit("SET_LAST_PERIOD", getters.organizationId);
       }
       return response;
     },
@@ -78,19 +94,28 @@ export default {
       return response;
     },
     // get periods
-    async getPeriods({ commit, getters }, { params }) {
-      commit("SET_LOADING", true);
-      commit("SET_DATA_LOADED", false);
+    async getPeriods({ commit, getters, dispatch }, { params }) {
+      dispatch("setLoading", true);
+      commit("SET_DATA_LOADED", {
+        isLoaded: false,
+        organizationId: getters.organizationId,
+      });
 
       const response = await apiGet({ url: `periods`, params });
-      commit("SET_LOADING", false);
+      dispatch("setLoading", false);
 
       if (!response.isError) {
-        commit("SET_ALL", { payload: response.data });
+        commit("SET_ALL", {
+          organizationId: getters.organizationId,
+          data: response.data,
+        });
         if (!getters.current) {
-          commit("SET_LAST_PERIOD");
+          commit("SET_LAST_PERIOD", getters.organizationId);
         }
-        commit("SET_DATA_LOADED", true);
+        commit("SET_DATA_LOADED", {
+          isLoaded: true,
+          organizationId: getters.organizationId,
+        });
       }
       return response;
     },

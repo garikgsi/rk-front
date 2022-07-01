@@ -24,7 +24,10 @@
 import AppDashboardWidgetVue from "@/views/AppSkeleton/AppDashboardWidget.vue";
 import paymentsRepository from "@/composition/payments/paymentsRepository";
 import planRepository from "@/composition/plans/planRepository";
-import { onMounted, computed } from "vue";
+import { onMounted, computed, ref } from "vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import currentPeriod from "@/composition/periods/currentPeriod";
+
 // import currentPeriod from "@/composition/periods/currentPeriod";
 
 export default {
@@ -32,8 +35,12 @@ export default {
   setup() {
     const { fetchPaymentsData, sumPayments } = paymentsRepository();
     const { sumPlans } = planRepository();
-    // const { periodId } = currentPeriod();
-
+    // admin permissions
+    const { isAdmin } = currentOrganization();
+    // widget color
+    const color = ref("pink");
+    // current period
+    const { period } = currentPeriod();
     // mounted hook - load payments data
     onMounted(() => {
       fetchPaymentsData();
@@ -45,35 +52,33 @@ export default {
     });
 
     const buttons = computed(() => {
-      return [
+      let buttons = [
         { title: "Список", to: { name: "payments" }, color: "primary" },
-        {
+      ];
+      if (isAdmin.value) {
+        buttons.push({
           title: "Внести",
           to: {
             name: "payments-form",
+            params: { periodId: period.value.id },
           },
-          color: "primary",
-        },
-        { title: "Долги", to: { name: "debt" }, color: "red" },
-      ];
+          color: "positive",
+        });
+        buttons.push({ title: "Долги", to: { name: "debt" }, color: "red" });
+      }
+      return buttons;
     });
 
     return {
       sumPayments,
       buttons,
       sumDebt,
+      isAdmin,
+      color,
     };
   },
   components: {
     "app-dashboard-widget": AppDashboardWidgetVue,
-  },
-  data() {
-    return {
-      color: "pink",
-      currentPeriod: {
-        id: 1,
-      },
-    };
   },
 };
 </script>

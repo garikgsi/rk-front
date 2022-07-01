@@ -1,5 +1,6 @@
 import { useStore } from "vuex";
 import { computed } from "vue";
+import kidSearch from "@/composition/kids/kidSearch";
 
 import currentPeriod from "@/composition/periods/currentPeriod";
 
@@ -7,15 +8,28 @@ export default function operationRepository() {
   const store = useStore();
   const { periodId } = currentPeriod();
 
+  // kid search function
+  const { getKidById } = kidSearch();
+
   // data loaded for period
   const dataLoaded = computed(
     () => store.state.payments?.dataLoaded[periodId.value] || false
   );
 
   // all operations items for period
-  const paymentsItems = computed(() =>
-    periodId.value ? store.state.payments.all[periodId.value] : []
-  );
+  const paymentsItems = computed(() => {
+    if (periodId.value && dataLoaded.value) {
+      return [...store.state.payments.all[periodId.value]].map((payment) => {
+        let modPayment = { ...payment };
+        if (payment.kid_id) {
+          const kid = getKidById(payment.kid_id);
+          modPayment.kid = kid.fio;
+        }
+        return modPayment;
+      });
+    }
+    return [];
+  });
   // data loaded
   const paymentsLoaded = computed(() => store.state.payments.dataLoaded);
 

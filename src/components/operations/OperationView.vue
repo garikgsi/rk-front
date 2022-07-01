@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import moment from "moment";
+import { dateUserFormat } from "@/composition/dates";
 import { useRouter } from "vue-router";
 import { ref, toRefs, onMounted } from "vue";
 
@@ -64,9 +64,7 @@ export default {
         if (item.value.plan_id)
           item.value.plan = getPlanById(item.value.plan_id)?.title;
         if (item.value.date_operation)
-          item.value.date_operation = moment(item.value.date_operation).format(
-            "DD.MM.YYYY"
-          );
+          item.value.date_operation = dateUserFormat(item.value.date_operation);
       }
     });
     // close form action

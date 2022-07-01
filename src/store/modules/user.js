@@ -7,6 +7,12 @@ export default {
     isAuth(state) {
       return !!state.user;
     },
+    currentUser(state) {
+      if (state.user?.id) {
+        return state.user.id;
+      }
+      return null;
+    },
   },
   mutations: {
     SET_USER(state, { user }) {
@@ -17,9 +23,11 @@ export default {
     logOut({ commit }) {
       commit("SET_USER", { user: null });
     },
-    async setUser({ commit }, { email, token, name = null }) {
+    async setUser({ commit }, { id, email, token, name = null }) {
+      const userData = { email, token, name: name ? name : email };
+      if (id) userData.id = id;
       return commit("SET_USER", {
-        user: { email, token, name: name ? name : email },
+        user: userData,
       });
     },
   },

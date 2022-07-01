@@ -26,6 +26,7 @@ import AppSideBar from "@/views/AppSkeleton/SideBar.vue";
 import { checkStoredUser } from "@/composition/auth/appAuth";
 import AppHeader from "@/views/AppSkeleton/AppHeader.vue";
 import AppFooterVue from "./views/AppFooter.vue";
+import { useMeta } from "quasar";
 
 export default {
   setup() {
@@ -33,6 +34,15 @@ export default {
     // router & store
     // const router = useRouter();
     const store = useStore();
+
+    // meta
+    const metaTitle = ref("Главная");
+    useMeta(() => {
+      return {
+        title: metaTitle.value,
+        titleTemplate: (title) => `Родительский комитет - ${title}`,
+      };
+    });
 
     return {
       leftDrawerOpen,
@@ -58,6 +68,11 @@ export default {
     sideBarMenu() {
       return [
         { to: { name: "tokens" }, title: "My tokens", icon: "api" },
+        {
+          to: { name: "organizations" },
+          title: "Выбор учебного заведения",
+          icon: "school",
+        },
         {
           to: { name: "plans" },
           title: "Планирование бюджета",

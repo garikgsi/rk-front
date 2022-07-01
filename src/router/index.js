@@ -20,6 +20,10 @@ import RegisterViewVue from "@/views/auth/RegisterView.vue";
 import RestorePasswordVue from "@/views/auth/RestorePasswordView.vue";
 import VerifyViewVue from "@/views/auth/VerifyView.vue";
 import AcceptInviteVue from "@/views/auth/AcceptInviteView.vue";
+import PublicViewVue from "@/views/PublicView.vue";
+import OrganizationEditorViewVue from "@/views/organizations/OrganizationEditorView.vue";
+import OrganizationViewVue from "@/views/organizations/OrganizationView.vue";
+import InviteRegisterVue from "@/views/InviteRegister.vue";
 
 const routes = [
   {
@@ -130,6 +134,31 @@ const routes = [
     name: "debt",
     component: DebtViewVue,
   },
+  {
+    path: "/organization-form/:id?",
+    name: "organization-form",
+    component: OrganizationEditorViewVue,
+    props: true,
+  },
+  {
+    path: "/organizations",
+    name: "organizations",
+    component: OrganizationViewVue,
+    props: true,
+  },
+  {
+    path: "/invite",
+    name: "invite",
+    component: InviteRegisterVue,
+    props: true,
+  },
+  {
+    path: "/:slug",
+    name: "public",
+    component: PublicViewVue,
+    meta: { noAuth: true },
+    props: true,
+  },
 ];
 
 const router = createRouter({
@@ -148,13 +177,13 @@ router.beforeEach((to, from, next) => {
       // check save logged user
       checkStoredUser().then((isAuth) => {
         if (isAuth) {
-          next(to);
+          next();
         } else {
           next({ name: "login" });
         }
       });
     } else {
-      next();
+      if (from != to) next();
     }
   }
 });

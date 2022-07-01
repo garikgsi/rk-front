@@ -23,24 +23,6 @@ export default function parentsRepository() {
     return [];
   });
 
-  // parents grouped by kids
-  // const ParentsByKid = computed(() => {
-  //   let res = {};
-  //   if (dataLoaded.value) {
-  //     parentsItems.value.forEach((parent) => {
-  //       if (res[parent.kid_id]) {
-  //         res[parent.kid_id].push(parent);
-  //       } else {
-  //         res[parent.kid_id] = [parent];
-  //       }
-  //     });
-  //     for (const kidId of res) {
-  //       res[kidId] = res[kidId].sort((a, b) => a.fio.localeCompare(b.fio));
-  //     }
-  //   }
-  //   return res;
-  // });
-
   // get kid parents
   const kidParents = (kidId) => {
     return (

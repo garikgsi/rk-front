@@ -18,12 +18,12 @@ export default {
   name: "period-select-input",
   mixins: [inputMixin],
   setup() {
-    const { periods, currentPeriod, changePeriod, getPeriods } =
+    const { periods, currentPeriod, changePeriod /*fetchPeriods*/ } =
       periodRepository();
     // created hook
     // load all periods to state
     onMounted(() => {
-      getPeriods({});
+      // fetchPeriods();
     });
 
     const updateValue = (val) => {

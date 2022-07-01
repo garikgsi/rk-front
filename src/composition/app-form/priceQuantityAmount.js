@@ -13,12 +13,12 @@ export default function priceQuantityAmount() {
     const [newPrice, newQuantity] = newValue;
     // for price
     if (oldPrice != newPrice && newQuantity) {
-      amount.value = newPrice * newQuantity;
+      amount.value = Math.round(newPrice * newQuantity * 100) / 100;
       // stop();
     }
     // for quantity
     if (oldQuantity != newQuantity && newPrice) {
-      amount.value = newPrice * newQuantity;
+      amount.value = Math.round(newPrice * newQuantity * 100) / 100;
       // stop();
     }
   });

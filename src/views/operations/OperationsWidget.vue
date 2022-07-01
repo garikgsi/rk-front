@@ -14,46 +14,53 @@
 <script>
 import AppDashboardWidgetVue from "@/views/AppSkeleton/AppDashboardWidget.vue";
 import operationsRepository from "@/composition/operations/operationsRepository";
-import { onMounted } from "vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import currentPeriod from "@/composition/periods/currentPeriod";
+import { onMounted, computed, ref } from "vue";
 
 export default {
   name: "operations-widget",
   setup() {
+    // get operations data
     const { sumOperations, fetchOperationsData } = operationsRepository();
+    // check admin permissions
+    const { isAdmin } = currentOrganization();
+    // widget color
+    const color = ref("green");
+    // current period
+    const { period } = currentPeriod();
 
+    // mounted hook
     onMounted(() => {
       fetchOperationsData();
+    });
+    // widget buttons
+    const buttons = computed(() => {
+      let buttons = [
+        { title: "Список", to: { name: "operations" }, color: "primary" },
+      ];
+      if (isAdmin.value)
+        buttons.push({
+          title: "Добавить",
+          to: {
+            name: "operations-form",
+            params: { periodId: period.value.id },
+          },
+          color: "positive",
+        });
+      return buttons;
     });
 
     return {
       sumOperations,
+      currentPeriod,
+      isAdmin,
+      buttons,
+      color,
     };
   },
   components: {
     "app-dashboard-widget": AppDashboardWidgetVue,
-  },
-  data() {
-    return {
-      color: "green",
-      currentPeriod: {
-        id: 1,
-      },
-    };
-  },
-  computed: {
-    buttons() {
-      return [
-        { title: "Список", to: { name: "operations" }, color: "primary" },
-        {
-          title: "Добавить",
-          to: {
-            name: "operations-form",
-            params: { periodId: this.currentPeriod.id },
-          },
-          color: "primary",
-        },
-      ];
-    },
   },
 };
 </script>

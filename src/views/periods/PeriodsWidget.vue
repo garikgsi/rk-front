@@ -5,7 +5,7 @@
     icon="date_range"
     v-if="currentPeriod"
   >
-    <template v-slot:buttons>
+    <template v-slot:buttons v-if="isAdmin">
       <q-btn label="Новый" flat color="primary">
         <q-menu v-model="showAddPeriod" self="top middle">
           <q-card>
@@ -38,6 +38,9 @@
       <div>
         Текущий период: <span>{{ currentPeriod.name }}</span>
       </div>
+      <div>
+        {{ period }}
+      </div>
     </div>
   </app-dashboard-widget>
 </template>
@@ -45,8 +48,10 @@
 <script>
 import AppDashboardWidgetVue from "@/views/AppSkeleton/AppDashboardWidget.vue";
 import PeriodFormVue from "@/components/periods/PeriodForm.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import periodRepository from "@/composition/periods/periodRepository";
+import currentOrganization from "@/composition/organizations/currentOrganization";
+import { dateUserFormat } from "@/composition/dates";
 
 export default {
   name: "periods-widget",
@@ -55,9 +60,17 @@ export default {
     "period-form": PeriodFormVue,
   },
   setup() {
+    const { isAdmin } = currentOrganization();
     const { currentPeriod } = periodRepository();
     let showAddPeriod = ref(false);
     let showEditPeriod = ref(false);
+    // period
+    const period = computed(() => {
+      return `${dateUserFormat(
+        currentPeriod.value.start_date
+      )}-${dateUserFormat(currentPeriod.value.end_date)}`;
+    });
+
     // submitted add new period form
     const submitted = (response) => {
       if (response.data) showAddPeriod.value = false;
@@ -72,6 +85,8 @@ export default {
       currentPeriod,
       showAddPeriod,
       showEditPeriod,
+      isAdmin,
+      period,
     };
   },
 };

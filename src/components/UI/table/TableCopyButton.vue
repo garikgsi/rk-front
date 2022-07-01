@@ -1,5 +1,12 @@
 <template>
-  <q-btn icon="content_copy" flat :to="to" @click.stop="click"></q-btn>
+  <q-btn
+    icon="content_copy"
+    :color="color"
+    :flat="flat"
+    :round="round"
+    :to="to"
+    @click.stop="click"
+  ></q-btn>
 </template>
 
 <script>
@@ -10,6 +17,21 @@ export default {
       required: false,
       type: [String, Object, null],
       default: null,
+    },
+    color: {
+      type: String,
+      require: false,
+      default: "primary",
+    },
+    round: {
+      type: Boolean,
+      require: false,
+      default: false,
+    },
+    flat: {
+      type: Boolean,
+      require: false,
+      default: false,
     },
   },
   methods: {

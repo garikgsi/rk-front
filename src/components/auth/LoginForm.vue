@@ -4,7 +4,7 @@
       v-model="login"
       label="Логин"
       :required="true"
-      hint="Используте адрес электронной почты в качестве лоина"
+      hint="Используте адрес электронной почты в качестве логина"
     ></app-email-input>
 
     <app-password-input

@@ -5,7 +5,8 @@ export default function operationSearch() {
 
   const getOperationById = (id) => {
     if (operationItems.value) {
-      return [...operationItems.value].find((item) => item.id == id);
+      const operation = [...operationItems.value].find((item) => item.id == id);
+      if (operation) return { ...operation };
     }
     return null;
   };

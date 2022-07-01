@@ -3,8 +3,14 @@ import { computed } from "vue";
 
 export default function currentPeriod() {
   const store = useStore();
-  const period = computed(() => store.getters["periods/currentPeriod"]);
-  const periodId = computed(() => store.state.periods.current);
+  const periodId = computed(
+    () => store.state.periods.current[store.state.organizations.current]
+  );
+  const period = computed(() => {
+    return store.state.periods.all[store.state.organizations.current].find(
+      (period) => period.id == periodId.value
+    );
+  });
 
   return { periodId, period };
 }

@@ -5,6 +5,7 @@
     class="q-gutter-md"
     ref="kidsForm"
     v-focus
+    v-if="organizationId"
   >
     <app-text-input
       v-model="last_name"
@@ -53,6 +54,7 @@
 
     <form-buttons @close="closeForm" :closable="closable"></form-buttons>
   </q-form>
+  <organizations-list v-else></organizations-list>
 </template>
 
 <script>
@@ -63,8 +65,10 @@ import FormButtonsVue from "@/components/UI/form/FormButtons.vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { ref, toRefs, onMounted } from "vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
 
 import kidSearch from "@/composition/kids/kidSearch";
+import OrganizationsListVue from "../organizations/OrganizationsList.vue";
 
 export default {
   // name: "kids-form",
@@ -95,7 +99,8 @@ export default {
     const router = useRouter();
     const store = useStore();
     const { id, mode, returnOnSubmit } = toRefs(props);
-
+    // get current organization id
+    const { organizationId } = currentOrganization();
     // search by id function
     const { getKidById } = kidSearch();
 
@@ -142,6 +147,7 @@ export default {
       else data.delete("start_study");
       if (end_study.value) data.set("end_study", end_study.value);
       else data.delete("end_study");
+      data.append("organization_id", organizationId.value);
 
       // switch method
       if (id.value) {
@@ -181,7 +187,7 @@ export default {
       birthday,
       start_study,
       end_study,
-
+      organizationId,
       closeForm,
       formSubmit,
       formReset,
@@ -191,6 +197,7 @@ export default {
     "app-date-input": AppDateInputVue,
     "app-text-input": AppTextInputVue,
     "form-buttons": FormButtonsVue,
+    "organizations-list": OrganizationsListVue,
   },
 };
 </script>
