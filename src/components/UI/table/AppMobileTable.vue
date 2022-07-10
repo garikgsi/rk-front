@@ -74,7 +74,7 @@
                 @submitted="deleteClick(item)"
               ></table-delete-button>
             </div>
-            <slot name="actions" :row="props.row"></slot>
+            <slot name="actions" :row="item"></slot>
           </div>
         </q-expansion-item>
         <q-item v-else>
