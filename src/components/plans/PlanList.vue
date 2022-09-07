@@ -68,6 +68,15 @@ export default {
           type: "money",
           mobile: "subTitle",
         },
+        {
+          name: "created_at",
+          field: "created_at",
+          label: "Дата планирования",
+          sortable: false,
+          align: "left",
+          type: "date",
+          mobile: "created_at",
+        },
       ];
       if (isAdmin.value) {
         columns.push({
@@ -114,7 +123,12 @@ export default {
           });
         }
         res = res.map((row) => {
-          return { id: row.id, title: row.title, amount: row.amount };
+          return {
+            id: row.id,
+            title: row.title,
+            amount: row.amount,
+            created_at: row.created_at,
+          };
         });
 
         return res;

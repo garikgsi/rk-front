@@ -70,14 +70,17 @@ export default {
           id: 3,
           title: "Остаток текущий:",
           amount:
-            formatTotals.value.startSaldo +
-            formatTotals.value.startDebt +
-            formatTotals.value.payments -
-            formatTotals.value.operations,
+            Math.round(
+              (formatTotals.value.startSaldo +
+                formatTotals.value.startDebt +
+                formatTotals.value.payments -
+                formatTotals.value.operations) *
+                100
+            ) / 100,
         },
         {
           id: 4,
-          title: "Долг - отрицательное значение:",
+          title: "Долг:",
           amount: formatTotals.value.payments - formatTotals.value.plans,
         },
         {

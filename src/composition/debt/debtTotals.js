@@ -8,7 +8,7 @@ export default function debtTotals(data) {
         return {
           planSum: (acc.planSum += row.planSum),
           paySum: (acc.paySum += row.paySum),
-          debt: (acc.debt += row.debt),
+          debt: (acc.debt += row.debt < 0 ? row.debt : 0),
         };
       },
       { planSum: 0, paySum: 0, debt: 0 }

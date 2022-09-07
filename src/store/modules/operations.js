@@ -1,4 +1,4 @@
-import { apiGet, apiDelete, apiPost, apiPut } from "@/composition/requestApi";
+import { apiGet, apiDelete, apiPost, apiPatch } from "@/composition/requestApi";
 import { addInfo } from "@/composition/addMessage";
 import periodStore from "./periods";
 import organizationStore from "./organizations";
@@ -35,11 +35,22 @@ export default {
         state.all[data.period_id] = [data];
       }
     },
-    EDIT(state, { data }) {
-      const editedItem = state.all[data.period_id].findIndex(
+    EDIT(state, { data, oldPeriodId }) {
+      const editedItem = state.all[oldPeriodId].findIndex(
         (row) => row.id === data.id
       );
-      if (editedItem !== -1) state.all[data.period_id][editedItem] = data;
+      if (editedItem !== -1) {
+        if (oldPeriodId == data.period_id) {
+          state.all[data.period_id][editedItem] = data;
+        } else {
+          state.all[oldPeriodId].splice(editedItem, 1);
+          if (state.all[data.period_id]) {
+            state.all[data.period_id].push(data);
+          } else {
+            state.all[data.period_id] = [data];
+          }
+        }
+      }
     },
     SET_LOADING(state, isLoading) {
       state.loading = isLoading;
@@ -106,12 +117,14 @@ export default {
       return response.isError;
     },
     // edit row
-    async editOperation({ commit, dispatch }, { id, data }) {
+    async editOperation({ commit, dispatch, getters }, { id, data }) {
       dispatch("setLoading", true);
-      const response = await apiPut({ url: `operations/${id}`, data });
+      const response = await apiPatch({ url: `operations/${id}`, data });
       dispatch("setLoading", false);
       if (!response.isError) {
-        commit("EDIT", { data: response.data });
+        // commit("REMOVE", { id, periodId: getters.periodId });
+        // commit("ADD", { data: response.data });
+        commit("EDIT", { data: response.data, oldPeriodId: getters.periodId });
         addInfo(`Запись успешно изменена`);
       }
       return response.isError;

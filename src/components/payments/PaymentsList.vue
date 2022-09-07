@@ -3,6 +3,7 @@
     title="Чтобы просмотреть оплаты выберите сначала учебное заведение"
   >
     <app-table
+      v-if="isAdmin"
       :items="items"
       :columns="columns"
       :editable="isAdmin"
@@ -17,6 +18,9 @@
       @copy-click="copyClick"
       @delete-click="deleteClick"
     ></app-table>
+    <div v-else>
+      <h1>Просматривать оплаты могут только администраторы</h1>
+    </div>
   </organization-require>
 </template>
 

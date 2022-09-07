@@ -1,19 +1,20 @@
 import { useStore } from "vuex";
 import { computed } from "vue";
 import currentOrganization from "@/composition/organizations/currentOrganization";
+import moment from "moment";
 
 export default function kidsRepository() {
   const store = useStore();
   // current organization
   const { organizationId } = currentOrganization();
 
-  // data loaded for period
+  // data loaded for organization
   const kidsLoaded = computed(
     () => store.state.kids.dataLoaded[organizationId.value] || false
   );
 
-  // all operations items for period
-  const kidsItems = computed(() => {
+  // all kids in organization
+  const allKidsItems = computed(() => {
     if (organizationId.value && kidsLoaded.value) {
       return store.state.kids.all[organizationId.value]
         .map((kid) => {
@@ -23,12 +24,17 @@ export default function kidsRepository() {
               fio: `${kid.last_name} ${kid.name} ${
                 kid.patronymic ? kid.patronymic : ""
               }`,
+              isOut:
+                kid.end_study !== null && moment(kid.end_study) <= moment(),
             },
           };
         })
         .sort((a, b) => a.fio.localeCompare(b.fio));
     }
     return [];
+  });
+  const kidsItems = computed(() => {
+    return [...allKidsItems.value].filter((kid) => !kid.is_out);
   });
 
   // kids count
@@ -59,6 +65,7 @@ export default function kidsRepository() {
 
   return {
     kidsItems,
+    allKidsItems,
     fetchKidsData,
     kidsLoaded,
     kidsCount,

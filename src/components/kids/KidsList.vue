@@ -15,11 +15,22 @@
         ></q-btn>
       </div>
       <div class="col-xs-10 col-sm-8 q-px-md">
-        <table-search
-          v-model="searchLine"
-          :dense="false"
-          label="Поиск по ФИО ребенка"
-        ></table-search>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-6">
+            <table-search
+              v-model="searchLine"
+              :dense="false"
+              label="Поиск по ФИО ребенка"
+            ></table-search>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6 q-mt-md q-pl-md">
+            <checkbox-input
+              v-model="withOut"
+              label="Показать убывших"
+              color="red"
+            ></checkbox-input>
+          </div>
+        </div>
       </div>
     </div>
     <app-spinner v-else></app-spinner>
@@ -44,11 +55,12 @@ import screen from "@/composition/screen";
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
 import AppSpinnerVue from "../UI/AppSpinner.vue";
+import AppCheckboxInputVue from "../UI/inputs/AppCheckboxInput.vue";
 
 export default {
   setup() {
     // kids items
-    const { kidsItems, fetchKidsData, kidsLoaded } = kidsRepository();
+    const { allKidsItems, fetchKidsData, kidsLoaded } = kidsRepository();
 
     // is phone prop
     const { isPhone } = screen();
@@ -58,11 +70,17 @@ export default {
 
     // search line input
     const searchLine = ref("");
+    // if end study
+    const withOut = ref(false);
 
     // kids list
     const kids = computed(() => {
+      let filteredKids = [...allKidsItems.value];
+      if (withOut.value === false) {
+        filteredKids = filteredKids.filter((kid) => kid.isOut === false);
+      }
       if (searchLine.value && searchLine.value.length > 0) {
-        return [...kidsItems.value].filter((row) => {
+        filteredKids = filteredKids.filter((row) => {
           return (
             `${row.last_name} ${row.name} ${row.patronymic}`
               .toLowerCase()
@@ -70,7 +88,7 @@ export default {
           );
         });
       }
-      return kidsItems.value;
+      return filteredKids;
     });
 
     // fetch data on mounting
@@ -83,6 +101,7 @@ export default {
       searchLine,
       isPhone,
       isAdmin,
+      withOut,
       kidsLoaded,
     };
   },
@@ -92,6 +111,7 @@ export default {
     "table-search": TableSearchVue,
     "organization-require": OrganizationRequeryVue,
     "app-spinner": AppSpinnerVue,
+    "checkbox-input": AppCheckboxInputVue,
   },
 };
 </script>

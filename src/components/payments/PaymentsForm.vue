@@ -6,6 +6,7 @@
     ref="paymentsForm"
     v-focus
   >
+    <period-selector v-model="period" :update-period="false"></period-selector>
     <app-date-input
       v-model="date_payment"
       name="date_payment"
@@ -54,6 +55,7 @@ import moment from "moment";
 
 import currentPeriod from "@/composition/periods/currentPeriod";
 import paymentsSearch from "@/composition/payments/paymentSearch";
+import PeriodSelectInputVue from "../UI/periods/PeriodSelectInput.vue";
 
 export default {
   // name: "operations-form",
@@ -75,7 +77,8 @@ export default {
     const { id, mode } = toRefs(props);
 
     // current period
-    const { periodId } = currentPeriod();
+    const { period: curPeriod } = currentPeriod();
+    // const { periodId, period: curPeriod } = currentPeriod();
 
     // search by id function
     const { getPaymentById } = paymentsSearch();
@@ -85,6 +88,7 @@ export default {
     const comment = ref("");
     const kid_id = ref(null);
     const amount = ref(null);
+    let period = ref(curPeriod.value);
 
     // fill inputs empty data
     const clearForm = () => {
@@ -113,7 +117,8 @@ export default {
       // specific values from form
       data.set("kid_id", kid_id.value ? kid_id.value : "");
       data.set("date_payment", date_payment.value);
-      data.append("period_id", periodId.value);
+      data.append("period_id", period.value.id);
+      // data.append("period_id", periodId.value);
       // switch method
       if (id.value) {
         // edit || copy
@@ -152,6 +157,7 @@ export default {
       date_payment,
       comment,
       kid_id,
+      period,
       closeForm,
       formSubmit,
       formReset,
@@ -163,6 +169,7 @@ export default {
     "app-money-input": AppMoneyInputVue,
     "form-buttons": FormButtonsVue,
     "kids-select-input": KidsSelectInputVue,
+    "period-selector": PeriodSelectInputVue,
   },
 };
 </script>

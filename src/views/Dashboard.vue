@@ -49,6 +49,7 @@ import KidsWidgetVue from "@/views/kids/KidsWidger.vue";
 import EmptyViewVue from "./EmptyView.vue";
 import OrganizationWidgetVue from "./organizations/OrganizationWidget.vue";
 import OrganizationsListVue from "@/components/organizations/OrganizationsList.vue";
+import BirthdayWidgetVue from "./misc/BirthdayWidget.vue";
 
 export default {
   name: "dashboard-view",
@@ -56,6 +57,7 @@ export default {
     const { organizationId, isAdmin } = currentOrganization();
     const widgets = computed(() => {
       let widgets = [
+        BirthdayWidgetVue,
         OrganizationWidgetVue,
         PlansWidgetVue,
         OperationsWidgetVue,

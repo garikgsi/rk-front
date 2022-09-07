@@ -3,6 +3,7 @@
     title="Выберите учебное учреждение для которого показать отчет"
   >
     <app-table
+      v-if="isAdmin"
       :items="items"
       :columns="columns"
       :editable="false"
@@ -17,6 +18,9 @@
       :pagination="pagination"
       @update:pagination="updatePagination"
     ></app-table>
+    <div v-else>
+      <h1>Просматривать отчет по долгам могут только администраторы</h1>
+    </div>
   </organization-require>
 </template>
 
@@ -28,16 +32,20 @@ import debtFilter from "@/composition/debt/debtFilter";
 import debtTotals from "@/composition/debt/debtTotals";
 import tablePagination from "@/composition/tablePagination";
 import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
+import currentOrganization from "@/composition/organizations/currentOrganization";
 
 import { ref, computed } from "vue";
 export default {
   setup() {
     const { debtData } = debtReport();
+    // is user == admin of organizations
+    const { isAdmin } = currentOrganization();
 
     const { filteredData, tableSearchString } = debtFilter(debtData);
 
     const tableData = computed(() => {
-      return [...filteredData.value].filter((kid) => kid.debt < 0);
+      // return [...filteredData.value].filter((kid) => kid.debt < 0);
+      return filteredData.value;
     });
 
     const { totals } = debtTotals(filteredData);
@@ -88,6 +96,7 @@ export default {
       tableSearchString,
       pagination,
       totals,
+      isAdmin,
       updatePagination,
     };
   },

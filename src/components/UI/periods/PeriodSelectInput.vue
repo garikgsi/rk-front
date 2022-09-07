@@ -12,12 +12,27 @@
 import inputMixin from "@/mixins/inputMixin";
 import AppSelectInputVue from "../inputs/AppSelectInput.vue";
 import periodRepository from "@/composition/periods/periodRepository";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, toRefs } from "vue";
 
 export default {
   name: "period-select-input",
   mixins: [inputMixin],
-  setup() {
+  emits: ["update:modelValue"],
+  props: {
+    modelValue: {
+      type: Object,
+      required: false,
+    },
+    updatePeriod: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  setup(props, { emit }) {
+    // props
+    const { updatePeriod, modelValue } = toRefs(props);
+    // period repo
     const { periods, currentPeriod, changePeriod /*fetchPeriods*/ } =
       periodRepository();
     // created hook
@@ -27,7 +42,11 @@ export default {
     });
 
     const updateValue = (val) => {
-      if (val?.id != currentPeriod?.id) changePeriod(val.id);
+      if (updatePeriod.value) {
+        if (val?.id != currentPeriod?.id) changePeriod(val.id);
+      } else {
+        emit("update:modelValue", { id: val.id, name: val.title });
+      }
     };
 
     return {
@@ -37,14 +56,22 @@ export default {
         });
       }),
       periodValue: computed(() => {
-        if (currentPeriod.value) {
-          return {
-            id: currentPeriod.value.id,
-            title: currentPeriod.value.name,
-          };
+        if (updatePeriod.value) {
+          if (currentPeriod.value) {
+            return {
+              id: currentPeriod.value.id,
+              title: currentPeriod.value.name,
+            };
+          }
         } else {
-          return null;
+          if (modelValue.value) {
+            return {
+              id: modelValue.value.id,
+              title: modelValue.value.name,
+            };
+          }
         }
+        return null;
       }),
       currentPeriod,
       updateValue,

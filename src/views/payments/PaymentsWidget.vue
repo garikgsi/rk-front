@@ -12,7 +12,7 @@
       </div>
       <div>
         Сумма задолженности:
-        <span :class="sumDebt > 0 ? 'text-negative' : 'text-positive'"
+        <span :class="sumDebt < 0 ? 'text-negative' : 'text-positive'"
           >{{ sumDebt }} руб.</span
         >
       </div>
@@ -23,10 +23,11 @@
 <script>
 import AppDashboardWidgetVue from "@/views/AppSkeleton/AppDashboardWidget.vue";
 import paymentsRepository from "@/composition/payments/paymentsRepository";
-import planRepository from "@/composition/plans/planRepository";
+// import planRepository from "@/composition/plans/planRepository";
 import { onMounted, computed, ref } from "vue";
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import currentPeriod from "@/composition/periods/currentPeriod";
+import debtReport from "@/composition/debt/debtReport";
 
 // import currentPeriod from "@/composition/periods/currentPeriod";
 
@@ -34,7 +35,9 @@ export default {
   name: "operations-widget",
   setup() {
     const { fetchPaymentsData, sumPayments } = paymentsRepository();
-    const { sumPlans } = planRepository();
+    // const { fetchPlansData } = planRepository();
+    // debts
+    const { debtData } = debtReport();
     // admin permissions
     const { isAdmin } = currentOrganization();
     // widget color
@@ -44,11 +47,17 @@ export default {
     // mounted hook - load payments data
     onMounted(() => {
       fetchPaymentsData();
+      // fetchPlansData();
     });
 
     // sum debts by period
     const sumDebt = computed(() => {
-      return sumPlans.value - sumPayments.value;
+      // return sumPlans.value - sumPayments.value;
+      return [...debtData.value].reduce((acc, d) => {
+        if (d.debt < 0) acc += d.debt;
+        return acc;
+      }, 0);
+      // return 0;
     });
 
     const buttons = computed(() => {

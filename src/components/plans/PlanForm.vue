@@ -5,6 +5,8 @@
     class="q-gutter-md"
     ref="planForm"
   >
+    <period-selector v-model="period" :update-period="false"></period-selector>
+
     <app-text-input
       label="Статья учета"
       required
@@ -46,6 +48,7 @@ import { useStore } from "vuex";
 import currentPeriod from "@/composition/periods/currentPeriod";
 import planSearch from "@/composition/plans/planSearch";
 import kidsRepository from "@/composition/kids/kidsRepository";
+import PeriodSelectInputVue from "../UI/periods/PeriodSelectInput.vue";
 
 export default {
   name: "plan-form",
@@ -71,7 +74,8 @@ export default {
     const { kidsCount } = kidsRepository();
 
     // current period
-    const { periodId } = currentPeriod();
+    const { period: curPeriod } = currentPeriod();
+    // const { periodId, period: curPeriod } = currentPeriod();
 
     // search by id function
     const { getPlanById } = planSearch();
@@ -80,6 +84,7 @@ export default {
     // price/quantity/amount imported
     // id refs from props
     let title = ref("");
+    let period = ref(curPeriod.value);
 
     // fill inputs empty data
     const clearForm = () => {
@@ -105,7 +110,8 @@ export default {
     // submit form action
     const formSubmit = (evt) => {
       const data = new FormData(evt.target);
-      data.append("period_id", periodId.value);
+      data.append("period_id", period.value.id);
+      // data.append("period_id", periodId.value);
       if (id.value) {
         // edit || copy
         if (mode.value == "copy") {
@@ -142,6 +148,7 @@ export default {
       quantity,
       amount,
       title,
+      period,
       formSubmit,
       formReset,
       closeForm,
@@ -151,6 +158,7 @@ export default {
     "app-text-input": AppTextInputVue,
     "app-money-input": AppMoneyInputVue,
     "form-buttons": FormButtonsVue,
+    "period-selector": PeriodSelectInputVue,
   },
 };
 </script>

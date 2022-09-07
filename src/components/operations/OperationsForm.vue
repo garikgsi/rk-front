@@ -6,6 +6,8 @@
     ref="operationsForm"
     v-focus
   >
+    <period-selector v-model="period" :update-period="false"></period-selector>
+
     <app-date-input
       v-model="date_operation"
       name="date_operation"
@@ -82,6 +84,7 @@ import moment from "moment";
 
 import currentPeriod from "@/composition/periods/currentPeriod";
 import operationSearch from "@/composition/operations/operationSearch";
+import PeriodSelectInputVue from "../UI/periods/PeriodSelectInput.vue";
 
 export default {
   // name: "operations-form",
@@ -104,7 +107,8 @@ export default {
 
     let { price, quantity, amount } = priceQuantityAmount();
     // current period
-    const { periodId } = currentPeriod();
+    const { period: curPeriod } = currentPeriod();
+    // const { periodId, period: curPeriod } = currentPeriod();
 
     // search by id function
     const { getOperationById } = operationSearch();
@@ -116,6 +120,7 @@ export default {
     let image = ref(null);
     let imageUrl = ref(null);
     let check_url = ref("");
+    let period = ref(curPeriod.value);
 
     // fill inputs empty data
     const clearForm = () => {
@@ -155,7 +160,8 @@ export default {
       // specific values from form
       if (plan_id.value) data.set("plan_id", plan_id.value);
       data.set("date_operation", date_operation.value);
-      data.append("period_id", periodId.value);
+      data.append("period_id", period.value.id);
+      // data.append("period_id", periodId.value);
       // switch method
       if (id.value) {
         // edit || copy
@@ -199,6 +205,7 @@ export default {
       imageUrl,
       check_url,
       plan_id,
+      period,
       closeForm,
       formSubmit,
       formReset,
@@ -211,6 +218,7 @@ export default {
     "form-buttons": FormButtonsVue,
     "plans-select-input": PlansSelectInputVue,
     "app-file-input": AppFileInputVue,
+    "period-selector": PeriodSelectInputVue,
   },
 };
 </script>

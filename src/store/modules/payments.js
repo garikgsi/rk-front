@@ -35,11 +35,26 @@ export default {
         state.all[data.period_id] = [data];
       }
     },
-    EDIT(state, { data }) {
-      const editedItem = state.all[data.period_id].findIndex(
+    EDIT(state, { data, oldPeriodId }) {
+      // const editedItem = state.all[data.period_id].findIndex(
+      //   (row) => row.id === data.id
+      // );
+      // if (editedItem !== -1) state.all[data.period_id][editedItem] = data;
+      const editedItem = state.all[oldPeriodId].findIndex(
         (row) => row.id === data.id
       );
-      if (editedItem !== -1) state.all[data.period_id][editedItem] = data;
+      if (editedItem !== -1) {
+        if (oldPeriodId == data.period_id) {
+          state.all[data.period_id][editedItem] = data;
+        } else {
+          state.all[oldPeriodId].splice(editedItem, 1);
+          if (state.all[data.period_id]) {
+            state.all[data.period_id].push(data);
+          } else {
+            state.all[data.period_id] = [data];
+          }
+        }
+      }
     },
     SET_LOADING(state, isLoading) {
       state.loading = isLoading;
@@ -106,12 +121,12 @@ export default {
       return response.isError;
     },
     // edit row
-    async editPayment({ commit, dispatch }, { id, data }) {
+    async editPayment({ commit, dispatch, getters }, { id, data }) {
       dispatch("setLoading", true);
       const response = await apiPut({ url: `payments/${id}`, data });
       dispatch("setLoading", false);
       if (!response.isError) {
-        commit("EDIT", { data: response.data });
+        commit("EDIT", { data: response.data, oldPeriodId: getters.periodId });
         addInfo(`Запись успешно изменена`);
       }
       return response.isError;

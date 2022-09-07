@@ -19,7 +19,7 @@
       </div>
     </q-card-section>
 
-    <q-slide-transition>
+    <q-slide-transition v-if="isAdmin">
       <div v-show="cardExpanded[kid.id]">
         <q-card-section class="q-pa-none active-section">
           <parents-list
@@ -31,7 +31,10 @@
       </div>
     </q-slide-transition>
 
-    <q-card-section :class="{ 'active-section': cardExpanded[kid.id] }">
+    <q-card-section
+      :class="{ 'active-section': cardExpanded[kid.id] }"
+      v-if="isAdmin"
+    >
       <div class="row">
         <div class="col-8">
           <q-btn

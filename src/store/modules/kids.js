@@ -56,7 +56,7 @@ export default {
   actions: {
     // loading action
     setLoading({ commit }, isLoading) {
-      commit("app/SET_LOADING", isLoading, { root: true });
+      // commit("app/SET_LOADING", isLoading, { root: true });
       commit("SET_LOADING", isLoading);
     },
     // fetch data
