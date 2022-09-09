@@ -12,7 +12,8 @@ export default {
     dataLoaded: {},
     tablePagination: {
       page: 1,
-      sortBy: "title",
+      sortBy: "created_at",
+      descending: false,
       rowsPerPage: 20,
     },
   },

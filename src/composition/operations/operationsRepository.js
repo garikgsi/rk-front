@@ -11,7 +11,6 @@ export default function operationRepository() {
   const operationItems = computed(() =>
     periodId.value ? store.state.operations.all[periodId.value] : []
   );
-  // data loaded
   // data loaded for period
   const operationsLoaded = computed(
     () => store.state.operations?.dataLoaded[periodId.value] || false
@@ -27,7 +26,7 @@ export default function operationRepository() {
 
   // fetch data for period
   const fetchOperationsData = (params = {}) => {
-    if (!operationsLoaded.value && periodId?.value) {
+    if (!operationsLoaded.value && periodId.value) {
       store.dispatch("operations/getOperations", {
         params: { ...defaultParams.value, ...params },
       });
@@ -36,10 +35,12 @@ export default function operationRepository() {
 
   // sum operations amount
   const sumOperations = computed(() => {
-    if (operationItems.value)
-      return [...operationItems.value].reduce((acc, row) => {
+    if (operationsLoaded.value) {
+      const sumOp = [...operationItems.value].reduce((acc, row) => {
         return acc + parseFloat(row.amount);
       }, 0);
+      return Math.round(sumOp * 100) / 100;
+    }
     return 0;
   });
 

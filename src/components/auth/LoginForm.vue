@@ -20,7 +20,7 @@
     ></app-checkbox-input>
 
     <div class="row">
-      <div class="q-mt-sm col-sx-12 col-sm-12 col-md-6">
+      <div class="q-mt-sm col-sx-12">
         <q-btn
           class="q-mr-sm"
           label="Войти"
@@ -33,7 +33,8 @@
           :to="{ name: 'register' }"
         ></q-btn>
       </div>
-      <div class="q-mt-sm col-xs-12 col-sm-12 col-md-6" align="right">
+      <div class="q-mt-sm col-xs-12" align="right">
+        <q-separator inset class="q-my-sm"></q-separator>
         <q-btn
           label="Забыли пароль?"
           type="reset"

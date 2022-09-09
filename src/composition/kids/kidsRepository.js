@@ -2,21 +2,44 @@ import { useStore } from "vuex";
 import { computed } from "vue";
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import moment from "moment";
+import currentPeriod from "@/composition/periods/currentPeriod";
 
 export default function kidsRepository() {
   const store = useStore();
   // current organization
   const { organizationId } = currentOrganization();
+  const { period } = currentPeriod();
 
   // data loaded for organization
-  const kidsLoaded = computed(
-    () => store.state.kids.dataLoaded[organizationId.value] || false
-  );
+  const kidsLoaded = computed(() => {
+    try {
+      return store.state.kids.dataLoaded[organizationId.value] || false;
+    } catch (error) {
+      return false;
+    }
+  });
+
+  const storeItems = computed(() => {
+    const data = store.state.kids.all[organizationId.value];
+    if (data) {
+      return [...data].filter((kid) => {
+        return (
+          (kid.start_study === null && kid.end_study === null) ||
+          (kid.start_study !== null &&
+            moment(kid.start_study) > moment(period.value.start_date) &&
+            moment(kid.start_study) < moment(period.value.end_date)) ||
+          (kid.end_study !== null &&
+            moment(kid.end_study) > moment(period.value.start_date))
+        );
+      });
+    }
+    return [];
+  });
 
   // all kids in organization
   const allKidsItems = computed(() => {
-    if (organizationId.value && kidsLoaded.value) {
-      return store.state.kids.all[organizationId.value]
+    if (organizationId.value && storeItems.value && period.value) {
+      return [...storeItems.value]
         .map((kid) => {
           return {
             ...kid,
@@ -25,7 +48,9 @@ export default function kidsRepository() {
                 kid.patronymic ? kid.patronymic : ""
               }`,
               isOut:
-                kid.end_study !== null && moment(kid.end_study) <= moment(),
+                kid.end_study !== null &&
+                moment(kid.end_study) < moment(period.value.end_date) &&
+                moment(kid.end_study) <= moment(),
             },
           };
         })
@@ -33,8 +58,13 @@ export default function kidsRepository() {
     }
     return [];
   });
+
+  // by default return only studieing kids
   const kidsItems = computed(() => {
-    return [...allKidsItems.value].filter((kid) => !kid.is_out);
+    if (kidsLoaded.value) {
+      return [...allKidsItems.value].filter((kid) => !kid.isOut);
+    }
+    return [];
   });
 
   // kids count
@@ -56,7 +86,7 @@ export default function kidsRepository() {
   // fetch data for period
   const fetchKidsData = (params = {}) => {
     // console.log(`kids loaded=${kidsLoaded.value}`);
-    if (!kidsLoaded.value) {
+    if (organizationId.value && !kidsLoaded.value) {
       store.dispatch("kids/getKids", {
         params: { ...defaultParams.value, ...params },
       });

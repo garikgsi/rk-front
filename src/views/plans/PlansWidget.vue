@@ -11,7 +11,7 @@
         <span class="text-primary">{{ sumPlans }} руб.</span>
       </div>
       <div>
-        На 1 обучающегося:
+        На 1 обучающегося(в среднем):
         <span class="text-accent">{{ planByKid }} руб.</span>
       </div>
     </div>

@@ -133,6 +133,9 @@ export default {
             return (
               row.comment
                 .toLowerCase()
+                .indexOf(tableSearchString.value.toLowerCase()) > -1 ||
+              row.kid
+                .toLowerCase()
                 .indexOf(tableSearchString.value.toLowerCase()) > -1
             );
           });

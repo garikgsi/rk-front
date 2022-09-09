@@ -2,11 +2,13 @@
   <organization-require
     title="Выберите учебное учреждение для которого показать отчет"
   >
+    <!-- <pre>{{ items }}</pre> -->
     <app-table
       v-if="isAdmin"
       :items="items"
       :columns="columns"
       :editable="false"
+      :addable="false"
       :totalRow="{
         fio: 'ИТОГО:',
         planSum: totals.planSum,

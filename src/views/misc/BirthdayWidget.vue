@@ -10,7 +10,7 @@
       @navigation="switchMonthYear"
       :events="events.dates"
       event-color="red"
-      minimal
+      :minimal="true"
     />
     <template v-slot:buttons>
       <div v-if="events.birthdays[`${year}/${month}`]">
@@ -58,7 +58,9 @@ export default {
 
     // kids with birthdays
     const kidsBirthdays = computed(() => {
-      return [...kidsItems.value].filter((kid) => kid.birthday !== null);
+      return [...kidsItems.value]
+        .sort((a, b) => moment(a.birthday).unix() - moment(b.birthday).unix())
+        .filter((kid) => kid.birthday !== null);
     });
 
     // event - for use in calendar

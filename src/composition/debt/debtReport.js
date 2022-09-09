@@ -1,75 +1,53 @@
 import { computed } from "vue";
-import moment from "moment";
+// import moment from "moment";
 
 import kidsRepository from "@/composition/kids/kidsRepository";
 import paymentsRepository from "@/composition/payments/paymentsRepository";
 import planRepository from "@/composition/plans/planRepository";
+import planKids from "@/composition/plans/planKids";
+import paymentKids from "@/composition/payments/paymentKids";
+import { fm } from "@/composition/math";
 
 export default function debtReport() {
-  const { allKidsItems: kidsItems } = kidsRepository();
-  const { planItems } = planRepository();
-  // const { kidsItems, kidsCount } = kidsRepository();
-  // const { sumPlans, planItems } = planRepository();
-  const { paymentsItems } = paymentsRepository();
+  const { kidsLoaded, allKidsItems } = kidsRepository();
+  const { plansLoaded } = planRepository();
+  const { paymentsLoaded } = paymentsRepository();
+  const { sumPlanByKids } = planKids();
+  const { paymentsByKids } = paymentKids();
 
-  // all kids with outed
-  const debtDataWithOut = computed(() => {
-    // const planPerKid = Math.round(sumPlans.value / kidsCount.value);
-    if (planItems.value && kidsItems.value && paymentsItems.value) {
-      const defPlanPerKid = [...planItems.value].reduce(
-        (acc, plan) => (acc += plan.price),
-        0
-      );
-      // console.log(planItems.value);
-      return kidsItems.value.map((kid) => {
-        let kidPayments = paymentsItems.value
-          ? paymentsItems.value
-              .filter((payments) => payments.kid_id == kid.id)
-              .map((payment) => {
-                return {
-                  id: payment.id,
-                  comment: payment.comment,
-                  amount: payment.amount,
-                };
-              })
-          : [];
-        let kidPaymentSum = paymentsItems.value
-          ? kidPayments.reduce(
-              (acc, payment) => (acc += parseFloat(payment.amount)),
-              0
-            )
-          : 0;
-
-        // forming debt from start study date
-        let kidPlans = defPlanPerKid;
-        if (kid.start_study !== null) {
-          kidPlans = [...planItems.value].reduce((acc, plan) => {
-            if (moment(kid.start_study) <= moment(plan.created_at)) {
-              acc += plan.price;
-            }
-            return acc;
-          }, 0);
-        }
-
+  // debts per kid
+  const debtData = computed(() => {
+    if (kidsLoaded.value && plansLoaded.value && paymentsLoaded.value) {
+      const completeData = [...allKidsItems.value].map((kid) => {
         return {
-          id: kid.id,
-          fio: kid.fio,
-          isOut: kid.isOut,
-          planSum: kidPlans,
-          payments: kidPayments,
-          paySum: kidPaymentSum,
-          debt: kidPaymentSum - kidPlans,
+          ...kid,
+          ...{
+            planSum: sumPlanByKids.value[kid.id]?.planSum
+              ? sumPlanByKids.value[kid.id].planSum
+              : 0,
+            paySum: paymentsByKids.value[kid.id]?.paySum
+              ? paymentsByKids.value[kid.id].paySum
+              : 0,
+          },
         };
       });
+
+      return completeData
+        .map((kid) => {
+          return {
+            ...kid,
+            ...{
+              debt: fm(kid.paySum - kid.planSum),
+              planSum: fm(kid.planSum),
+              paySum: fm(kid.paySum),
+            },
+          };
+        })
+        .filter(
+          (kid) => kid.isOut === false || (kid.isOut === true && kid.debt != 0)
+        );
     }
     return [];
-  });
-
-  // table data with only has debts and outed or studieng
-  const debtData = computed(() => {
-    return debtDataWithOut.value.filter(
-      (kid) => kid.isOut === false || (kid.isOut === true && kid.debt != 0)
-    );
   });
 
   return { debtData };

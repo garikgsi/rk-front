@@ -23,7 +23,7 @@ export default function operationRepository() {
         let modPayment = { ...payment };
         if (payment.kid_id) {
           const kid = getKidById(payment.kid_id);
-          modPayment.kid = kid.fio;
+          if (kid) modPayment.kid = kid.fio;
         }
         return modPayment;
       });

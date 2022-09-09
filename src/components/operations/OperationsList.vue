@@ -149,9 +149,13 @@ export default {
 
     // calc itog amount
     const totalAmount = computed(() => {
-      return [...tableRows.value].reduce((acc, row) => {
-        return acc + parseFloat(row.amount);
-      }, 0);
+      return (
+        Math.round(
+          [...tableRows.value].reduce((acc, row) => {
+            return acc + parseFloat(row.amount);
+          }, 0) * 100
+        ) / 100
+      );
     });
 
     // table pagination from store

@@ -27,6 +27,7 @@
 
 <script>
 import { computed, toRefs, ref } from "vue";
+import { fm } from "@/composition/math";
 export default {
   props: {
     totals: {
@@ -44,6 +45,7 @@ export default {
         "operations",
         "plans",
         "startSaldo",
+        "currentSaldo",
       ];
       let res = {};
       for (let key of vals) {
@@ -69,24 +71,23 @@ export default {
         {
           id: 3,
           title: "Остаток текущий:",
-          amount:
-            Math.round(
-              (formatTotals.value.startSaldo +
-                formatTotals.value.startDebt +
-                formatTotals.value.payments -
-                formatTotals.value.operations) *
-                100
-            ) / 100,
+          amount: fm(
+            // formatTotals.value.startSaldo +
+            //   formatTotals.value.startDebt +
+            //   formatTotals.value.payments -
+            //   formatTotals.value.operations
+            formatTotals.value.currentSaldo
+          ),
         },
         {
           id: 4,
           title: "Долг:",
-          amount: formatTotals.value.payments - formatTotals.value.plans,
+          amount: fm(formatTotals.value.payments - formatTotals.value.plans),
         },
         {
           id: 5,
           title: "Долги прошлых периодов:",
-          amount: formatTotals.value.startDebt,
+          amount: fm(formatTotals.value.startDebt),
         },
       ];
     });

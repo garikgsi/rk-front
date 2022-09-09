@@ -6,6 +6,34 @@
         Онлайн-сервис контроля своевременного внесения оплаты в родительский
         комитет и прозрачные отчеты по тратам для родителей учащихся.
       </p>
+      <h2 class="text-primary text-h4">Основные возможности сервиса</h2>
+      <div class="row">
+        <div
+          class="col-xs-12 col-sm-12 col-md-6 col-lg-3 q-pa-sm"
+          v-for="slide in slides"
+          :key="slide.img"
+        >
+          <q-img
+            :src="slide.img"
+            style="height: 350px; max-width: 400px"
+            fit="contain"
+          >
+            <div
+              class="absolute-top text-center text-h5 bg-primary"
+              style="opacity: 0.8"
+            >
+              {{ slide.title }}
+            </div>
+            <div
+              class="absolute-bottom text-subtitle1 text-center bg-primary"
+              style="opacity: 0.8"
+            >
+              {{ slide.subTitle }}
+            </div>
+          </q-img>
+        </div>
+      </div>
+
       <h2 class="text-primary text-h4">Для кого этот сервис</h2>
       <p class="subtitle2">
         Сервис предлагает простой инструмент для учета взносов и контроля трат,
@@ -25,6 +53,16 @@
         может предоставить любой зарегистрированный пользователь или
         администратор.
       </p>
+      <h2 class="text-primary text-h4">Как попробовать сервис "на вкус"?</h2>
+      <p class="subtitle2">
+        Пример публичного отчета доступен по
+        <a target="_blank" href="/demo-school-587-for-example">ссылке</a>
+      </p>
+      <p class="subtitle2">
+        Работу интерфейса можно посмотреть на демо-версии без регистрации,
+        используя логин <span class="text-bold">demo@example.com</span> и пароль
+        <span class="text-bold">password</span>
+      </p>
       <h2 class="text-primary text-h4">Как зарегистрироваться</h2>
       <p class="subtitle2">
         В настоящий момент сервис закрыт для публичной регистрации, для
@@ -37,6 +75,7 @@
 
 <script>
 import { useMeta } from "quasar";
+import { ref } from "vue";
 export default {
   name: "home-view",
   setup() {
@@ -60,8 +99,46 @@ export default {
         },
       };
     });
+
+    const slides = ref([
+      {
+        img: "/widgets.png",
+        title: "Удобные виджеты",
+        subTitle: "вся информация на одном экране",
+      },
+      {
+        img: "/debt-report.png",
+        title: "Отчеты по долгам",
+        subTitle: "долги формируются с учетом выбывших и вновь прибывших детей",
+      },
+      {
+        img: "/public-report.png",
+        title: "Публичные отчеты",
+        subTitle:
+          "доступны в режим онлайн и не содержат персональной информации",
+      },
+      {
+        img: "/kid-parent-info.png",
+        title: "Дополнительная информация",
+        subTitle:
+          "все под рукой: дни рождения детей, финансы и контакты родителей",
+      },
+    ]);
+    return {
+      slides,
+      slide: ref("style"),
+      lorem:
+        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque voluptatem totam, architecto cupiditate officia rerum, error dignissimos praesentium libero ab nemo.",
+    };
   },
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.slide-text {
+  // background-color: grey;
+  opacity: 0.8;
+  color: white;
+  padding: 10px;
+}
+</style>
