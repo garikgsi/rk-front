@@ -2,8 +2,8 @@
 Сайт и демо - https://rk.tcu.su
 
 ## Стек разработки
-Vue3 Composition API | Vuex | VueRouter | ES6 | Quasar | Git
-(backend Laravel9 API https://github.com/garikgsi/rk-back)
+Vue3 Composition API | ES6 | Quasar | Git | Laravel API
+(backend https://github.com/garikgsi/rk-back)
 
 ## Техническое задание
 Ведение учета родительского комитета школы/детского сада: планирование расходов, поступление взносов, расходные операции.
