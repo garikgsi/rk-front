@@ -1,9 +1,10 @@
 import { computed } from "vue";
+import debtReport from "@/composition/debt/debtReport";
+import { fm } from "@/composition/math";
 
 export default function debtTotals(data) {
-  // total row
-  const totals = computed(() =>
-    data.value.reduce(
+  const calcSum = (data) => {
+    const sums = data.reduce(
       (acc, row) => {
         return {
           planSum: (acc.planSum += row.planSum),
@@ -12,8 +13,25 @@ export default function debtTotals(data) {
         };
       },
       { planSum: 0, paySum: 0, debt: 0 }
-    )
-  );
+    );
+    // format sums
+    for (const i in sums) {
+      sums[i] = fm(sums[i]);
+    }
 
-  return { totals };
+    return sums;
+  };
+
+  // sum oll debt
+  const { debtData } = debtReport();
+  const sumDebt = computed(() => {
+    return calcSum(debtData.value);
+  });
+
+  // total row
+  const totals = computed(() => {
+    return calcSum(data.value);
+  });
+
+  return { totals, sumDebt };
 }

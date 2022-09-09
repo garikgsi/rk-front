@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 export default function currentOrganization() {
   const store = useStore();
-  const organizationId = computed(() => store.state.organizations.current);
+  const organizationId = computed(() => store.state.organizations?.current);
   const organization = computed(() => {
     // () => store.getters["organizations/currentOrganization"]
     if (organizationId.value) {

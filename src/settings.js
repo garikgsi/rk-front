@@ -1,4 +1,4 @@
-const isDevelop = false;
+const isDevelop = true;
 
 export default {
   apiUrl: isDevelop

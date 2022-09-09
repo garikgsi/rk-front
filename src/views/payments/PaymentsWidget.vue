@@ -12,8 +12,8 @@
       </div>
       <div>
         Сумма задолженности:
-        <span :class="sumDebt < 0 ? 'text-negative' : 'text-positive'"
-          >{{ sumDebt }} руб.</span
+        <span :class="sumDebt.debt < 0 ? 'text-negative' : 'text-positive'"
+          >{{ sumDebt.debt }} руб.</span
         >
       </div>
     </div>
@@ -27,7 +27,7 @@ import paymentsRepository from "@/composition/payments/paymentsRepository";
 import { onMounted, computed, ref } from "vue";
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import currentPeriod from "@/composition/periods/currentPeriod";
-import debtReport from "@/composition/debt/debtReport";
+import debtTotals from "@/composition/debt/debtTotals";
 
 // import currentPeriod from "@/composition/periods/currentPeriod";
 
@@ -37,7 +37,7 @@ export default {
     const { fetchPaymentsData, sumPayments } = paymentsRepository();
     // const { fetchPlansData } = planRepository();
     // debts
-    const { debtData } = debtReport();
+    const { sumDebt } = debtTotals();
     // admin permissions
     const { isAdmin } = currentOrganization();
     // widget color
@@ -48,16 +48,6 @@ export default {
     onMounted(() => {
       fetchPaymentsData();
       // fetchPlansData();
-    });
-
-    // sum debts by period
-    const sumDebt = computed(() => {
-      // return sumPlans.value - sumPayments.value;
-      return [...debtData.value].reduce((acc, d) => {
-        if (d.debt < 0) acc += d.debt;
-        return acc;
-      }, 0);
-      // return 0;
     });
 
     const buttons = computed(() => {

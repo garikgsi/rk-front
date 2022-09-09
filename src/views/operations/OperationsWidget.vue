@@ -6,7 +6,8 @@
     icon="point_of_sale"
   >
     <div class="text-subtitle1">
-      Всего потрачено за период: <span>{{ sumOperations }} руб.</span>
+      Всего потрачено за период:
+      <span class="text-positive">{{ sumOperations }} руб.</span>
     </div>
   </app-dashboard-widget>
 </template>

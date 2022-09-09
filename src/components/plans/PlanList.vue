@@ -26,6 +26,7 @@ import AppTableVue from "../UI/table/AppTable.vue";
 import { computed, watch, ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { fm } from "@/composition/math";
 
 import currentPeriod from "@/composition/periods/currentPeriod";
 import planRepository from "@/composition/plans/planRepository";
@@ -72,7 +73,7 @@ export default {
           name: "created_at",
           field: "created_at",
           label: "Дата планирования",
-          sortable: false,
+          sortable: true,
           align: "left",
           type: "date",
           mobile: "created_at",
@@ -138,9 +139,11 @@ export default {
 
     // calc itog amount
     const totalAmount = computed(() => {
-      return [...tableRows.value].reduce((acc, row) => {
-        return acc + parseFloat(row.amount);
-      }, 0);
+      return fm(
+        [...tableRows.value].reduce((acc, row) => {
+          return acc + parseFloat(row.amount);
+        }, 0)
+      );
     });
 
     // remove row

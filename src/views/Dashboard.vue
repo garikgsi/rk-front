@@ -14,13 +14,24 @@
       <div v-else>
         <template v-if="organizationId">
           <div class="row" v-if="showWidgets">
-            <div
-              class="col-xs-12 col-sm-6 col-md-4 col-lg-3 q-pa-md"
-              n
-              v-for="(widget, i) in widgets"
-              :key="i"
-            >
-              <component :is="widget"></component>
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3">
+              <div class="row">
+                <div class="col-lg-12 q-pa-md">
+                  <birthday-widget></birthday-widget>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-9">
+              <div class="row">
+                <div
+                  class="col-xs-12 col-sm-6 col-md-6 col-lg-4 q-pa-md"
+                  n
+                  v-for="(widget, i) in widgets"
+                  :key="i"
+                >
+                  <component :is="widget"></component>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col" v-else>
@@ -57,7 +68,7 @@ export default {
     const { organizationId, isAdmin } = currentOrganization();
     const widgets = computed(() => {
       let widgets = [
-        BirthdayWidgetVue,
+        // BirthdayWidgetVue,
         OrganizationWidgetVue,
         PlansWidgetVue,
         OperationsWidgetVue,
@@ -162,6 +173,7 @@ export default {
   components: {
     "empty-view": EmptyViewVue,
     "organizations-list": OrganizationsListVue,
+    "birthday-widget": BirthdayWidgetVue,
   },
 };
 </script>

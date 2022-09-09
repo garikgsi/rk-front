@@ -19,7 +19,8 @@ export default {
   },
   // muattions
   mutations: {
-    SET_DATA_LOADED(state, { isLoaded, organizationId }) {
+    SET_DATA_LOADED(state, { organizationId, isLoaded }) {
+      // console.log(organizationId, isLoaded);
       state.dataLoaded[organizationId] = isLoaded;
     },
     SET_ALL(state, { organizationId, data }) {
