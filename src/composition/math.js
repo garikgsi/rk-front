@@ -1,4 +1,4 @@
 // format money
 export function fm(sum) {
-  return Math.round(parseFloat(sum) * 100) / 100;
+  return (Math.round(parseFloat(sum) * 100) / 100).toFixed(2);
 }

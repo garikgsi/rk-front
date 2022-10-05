@@ -18,7 +18,7 @@
     <template v-slot:body-cell-amount="props">
       <q-td :props="props">
         <span :class="{ 'text-negative': parseFloat(props.row.amount) < 0 }">{{
-          props.row.amount
+          fm(props.row.amount)
         }}</span>
       </q-td>
     </template>
@@ -111,7 +111,7 @@ export default {
       },
     ]);
 
-    return { items, columns, formatTotals };
+    return { items, columns, formatTotals, fm };
   },
 };
 </script>

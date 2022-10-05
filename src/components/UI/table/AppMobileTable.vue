@@ -96,7 +96,7 @@
                 :class="{
                   'text-negative': parseFloat(totalRow[col.name]) < 0,
                 }"
-                >{{ totalRow[col.name] }}</span
+                >{{ formatMoney(totalRow[col.name]) }}</span
               >
             </div>
           </div>
@@ -128,6 +128,7 @@ import TableCopyButtonVue from "@/components/UI/table/TableCopyButton.vue";
 import TableSearchVue from "./TableSearch.vue";
 import { ref, toRefs, computed } from "vue";
 import MobileTableRowVue from "@/components/UI/table/MobileTableRow.vue";
+import { fm } from "@/composition/math";
 export default {
   name: "app-table",
   props: {
@@ -251,6 +252,9 @@ export default {
     const formatDate = (val) => {
       return moment(val, "YYYY-MM-DD").format("DD.MM.YYYY");
     };
+    const formatMoney = (val) => {
+      return fm(val);
+    };
 
     // date columns
     const dateColumns = computed(() => {
@@ -319,6 +323,7 @@ export default {
       editClick,
       copyClick,
       deleteClick,
+      formatMoney,
     };
   },
   components: {

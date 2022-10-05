@@ -43,7 +43,7 @@
                   :class="{
                     'text-negative': parseFloat(totalRow[col.name]) < 0,
                   }"
-                  >{{ totalRow[col.name] }}</span
+                  >{{ formatMoney(totalRow[col.name]) }}</span
                 >
               </div>
               <div v-else></div>
@@ -105,7 +105,7 @@
         <div v-else-if="col.type == 'money'">
           <span
             :class="{ 'text-negative': parseFloat(props.row[col.name]) < 0 }"
-            >{{ props.row[col.name] }}</span
+            >{{ formatMoney(props.row[col.name]) }}</span
           >
         </div>
         <!-- other types -->
@@ -122,6 +122,7 @@ import TableDeleteButtonVue from "@/components/UI/table/TableDeleteButton.vue";
 import TableEditButtonVue from "@/components/UI/table/TableEditButton.vue";
 import TableCopyButtonVue from "@/components/UI/table/TableCopyButton.vue";
 import TableSearchVue from "@/components/UI/table/TableSearch.vue";
+import { fm } from "@/composition/math";
 
 export default {
   name: "app-desktop-table",
@@ -227,6 +228,9 @@ export default {
     clickImg() {},
     formatDate(val) {
       return moment(val, "YYYY-MM-DD").format("DD.MM.YYYY");
+    },
+    formatMoney(val) {
+      return fm(val);
     },
   },
 };

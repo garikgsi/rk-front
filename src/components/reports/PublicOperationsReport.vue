@@ -20,6 +20,7 @@
 import { ref, toRefs, computed } from "vue";
 import tablePagination from "@/composition/tablePagination";
 import AppTableVue from "../UI/table/AppTable.vue";
+import { fm } from "@/composition/math";
 export default {
   props: {
     operations: {
@@ -82,9 +83,11 @@ export default {
     });
 
     const total = computed(() => {
-      return items.value
-        ? items.value.reduce((acc, item) => (acc += item.amount), 0)
-        : 0;
+      return fm(
+        items.value
+          ? items.value.reduce((acc, item) => (acc += item.amount), 0)
+          : 0
+      );
     });
 
     // table pagination from store
