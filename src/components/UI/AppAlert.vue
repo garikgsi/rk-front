@@ -71,6 +71,9 @@ export default {
     clickOk() {
       this.$emit("ok");
     },
+    test() {
+      console.log("ok");
+    },
   },
 };
 </script>
