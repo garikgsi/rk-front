@@ -44,6 +44,32 @@
             v-model="showShare"
             @ok="showShare = false"
           >
+            <template v-slot:append_lines>
+              <q-btn
+                :href="`whatsapp://send?text=${shareSocialText}`"
+                flat
+                color="positive"
+                label="Whatsapp"
+              ></q-btn>
+              <q-btn
+                :href="`tg://msg_url?url=${shareSocialText}`"
+                flat
+                color="primary"
+                label="Telegram"
+              ></q-btn>
+              <q-btn
+                :href="`mailto:?subject=Ссылка на отчет родительского комитета&amp;body=Добрый день! ${shareSocialText}`"
+                flat
+                color="warning"
+                label="Email"
+              ></q-btn>
+              <q-btn
+                flat
+                color="accent"
+                label="Скопировать"
+                @click="copyUrl"
+              ></q-btn>
+            </template>
             <q-btn
               class="q-ma-xs"
               color="positive"
@@ -88,11 +114,13 @@
 
 <script>
 import { toRefs, computed, ref } from "vue";
+import { copyToClipboard } from "quasar";
 import TableEditButtonVue from "../UI/table/TableEditButton.vue";
 import TableCopyButtonVue from "../UI/table/TableCopyButton.vue";
 import TableDeleteButtonVue from "../UI/table/TableDeleteButton.vue";
 import AppAlertVue from "../UI/AppAlert.vue";
 import settings from "@/settings";
+import { addError, addInfo } from "@/composition/addMessage";
 export default {
   name: "organization-item",
   props: {
@@ -120,15 +148,43 @@ export default {
 
     const isAdmin = computed(() => organization.value.is_admin);
 
+    const publicUrl = computed(
+      () => `${settings.appUrl}/${organization.value.slug}`
+    );
+
     // share
     const showShare = ref(false);
     const shareSubTitle = computed(() => {
       return [
-        `В настоящий момент не реализован обмен через социальные сети. Чтобы поделиться публичным отчетом скопируйте ссылку и передайте ее любым удобным способом ${settings.appUrl}/${organization.value.slug}`,
+        `Чтобы поделиться публичным отчетом скопируйте ссылку и передайте ее любым удобным способом ${publicUrl.value}`,
       ];
     });
 
-    return { selectItem, deleteItem, isAdmin, shareSubTitle, showShare };
+    const shareSocialText = computed(
+      () =>
+        `Публичный отчет родительского комитета в режиме онлайн доступен по ссылке ${publicUrl.value}`
+    );
+
+    const copyUrl = () => {
+      copyToClipboard(publicUrl.value)
+        .then(() => {
+          addInfo("Ссылка скопирована в буфер обмена");
+        })
+        .catch(() => {
+          addError("Ссылку не удалось скопировать в буфер обмена");
+        });
+    };
+
+    return {
+      selectItem,
+      deleteItem,
+      isAdmin,
+      shareSubTitle,
+      shareSocialText,
+      showShare,
+      publicUrl,
+      copyUrl,
+    };
   },
   components: {
     "table-edit-button": TableEditButtonVue,

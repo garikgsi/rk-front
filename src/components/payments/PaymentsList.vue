@@ -27,7 +27,7 @@
 <script>
 import AppTableVue from "@/components/UI/table/AppTable.vue";
 
-import { computed, watch, ref, onMounted } from "vue";
+import { computed, watch, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -107,12 +107,14 @@ export default {
     // current period
     const { periodId } = currentPeriod();
     // all operations data for period
-    const { paymentsItems, fetchPaymentsData, sumPayments } =
-      paymentsRepository();
+    const {
+      filteredPaymentItems,
+      fetchPaymentsData,
+      sumPayments,
+      filter: tableSearchString,
+    } = paymentsRepository();
     // is loading prop for plans
     const loading = computed(() => store.state.payments.loading);
-    // search line
-    let tableSearchString = ref("");
 
     // fetch data on mounting
     onMounted(() => {
@@ -126,21 +128,8 @@ export default {
 
     // formatted table rows
     const tableRows = computed(() => {
-      if (paymentsItems.value) {
-        let res = [...paymentsItems.value];
-        if (tableSearchString.value && tableSearchString.value.length > 0) {
-          res = res.filter((row) => {
-            return (
-              row.comment
-                .toLowerCase()
-                .indexOf(tableSearchString.value.toLowerCase()) > -1 ||
-              row.kid
-                .toLowerCase()
-                .indexOf(tableSearchString.value.toLowerCase()) > -1
-            );
-          });
-        }
-        res = res.map((row) => {
+      if (filteredPaymentItems.value) {
+        return [...filteredPaymentItems.value].map((row) => {
           return {
             id: row.id,
             comment: row.comment,
@@ -149,9 +138,8 @@ export default {
             date_payment: row.date_payment,
           };
         });
-
-        return res;
       }
+
       return [];
     });
 

@@ -5,7 +5,9 @@
         <span class="q-ml-sm text-h5 text-white">{{ title }}</span>
       </q-card-section>
       <q-card-section class="q-pt-none q-mt-lg" v-if="lines">
+        <slot name="prepend_lines"></slot>
         <p v-for="(line, i) in lines" :key="i">{{ line }}</p>
+        <slot name="append_lines"></slot>
       </q-card-section>
       <q-separator spacer="md"></q-separator>
       <q-card-actions align="right">

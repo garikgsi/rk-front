@@ -1,5 +1,5 @@
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import kidSearch from "@/composition/kids/kidSearch";
 
 import currentPeriod from "@/composition/periods/currentPeriod";
@@ -7,6 +7,7 @@ import currentPeriod from "@/composition/periods/currentPeriod";
 export default function operationRepository() {
   const store = useStore();
   const { periodId } = currentPeriod();
+  const filter = ref("");
 
   // kid search function
   const { getKidById } = kidSearch();
@@ -41,6 +42,22 @@ export default function operationRepository() {
     };
   });
 
+  const filteredPaymentItems = computed(() => {
+    if (paymentsItems.value) {
+      if (filter.value) {
+        return [...paymentsItems.value].filter(
+          (row) =>
+            `${row.comment}`.toLowerCase().indexOf(filter.value.toLowerCase()) >
+              -1 ||
+            `${row.kid}`.toLowerCase().indexOf(filter.value.toLowerCase()) > -1
+        );
+      }
+      return paymentsItems.value;
+    }
+
+    return [];
+  });
+
   // fetch data for period
   const fetchPaymentsData = (params = {}) => {
     if (!dataLoaded.value && periodId?.value) {
@@ -52,8 +69,8 @@ export default function operationRepository() {
 
   // sum operations amount
   const sumPayments = computed(() => {
-    if (paymentsItems.value)
-      return [...paymentsItems.value].reduce((acc, row) => {
+    if (filteredPaymentItems.value)
+      return [...filteredPaymentItems.value].reduce((acc, row) => {
         return acc + parseFloat(row.amount);
       }, 0);
     return 0;
@@ -61,8 +78,10 @@ export default function operationRepository() {
 
   return {
     paymentsItems,
+    filteredPaymentItems,
     fetchPaymentsData,
     sumPayments,
     paymentsLoaded,
+    filter,
   };
 }
