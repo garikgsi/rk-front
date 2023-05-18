@@ -14,9 +14,14 @@
       name="title"
       v-focus
     ></app-text-input>
+    <kids-select-input
+      label="Только для учащегося"
+      v-model="kidId"
+    ></kids-select-input>
     <app-money-input
       label="Цена"
       required
+      disabled
       v-model="price"
       name="price"
     ></app-money-input>
@@ -32,6 +37,12 @@
       v-model="amount"
       name="amount"
     ></app-money-input>
+    <app-date-input
+      label="Дата начала учета"
+      required
+      v-model="startBillDate"
+    ></app-date-input>
+
     <form-buttons @close="closeForm"></form-buttons>
   </q-form>
 </template>
@@ -49,6 +60,8 @@ import currentPeriod from "@/composition/periods/currentPeriod";
 import planSearch from "@/composition/plans/planSearch";
 import kidsRepository from "@/composition/kids/kidsRepository";
 import PeriodSelectInputVue from "../UI/periods/PeriodSelectInput.vue";
+import AppDateInput from "@/components/UI/inputs/AppDateInput.vue";
+import KidsSelectInput from "@/components/UI/kids/KidsSelectInput.vue";
 
 export default {
   name: "plan-form",
@@ -83,8 +96,10 @@ export default {
     // form inputs
     // price/quantity/amount imported
     // id refs from props
-    let title = ref("");
-    let period = ref(curPeriod.value);
+    const title = ref("");
+    const period = ref(curPeriod.value);
+    const startBillDate = ref(new Date());
+    const kidId = ref(null);
 
     // fill inputs empty data
     const clearForm = () => {
@@ -102,6 +117,8 @@ export default {
         price.value = parseFloat(planItem.price);
         quantity.value = parseFloat(planItem.quantity);
         amount.value = parseFloat(planItem.amount);
+        startBillDate.value = planItem.start_bill_date;
+        kidId.value = planItem.kidId;
       } else {
         clearForm();
       }
@@ -149,12 +166,16 @@ export default {
       amount,
       title,
       period,
+      startBillDate,
+      kidId,
       formSubmit,
       formReset,
       closeForm,
     };
   },
   components: {
+    KidsSelectInput,
+    AppDateInput,
     "app-text-input": AppTextInputVue,
     "app-money-input": AppMoneyInputVue,
     "form-buttons": FormButtonsVue,

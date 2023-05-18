@@ -7,6 +7,7 @@
     :hint="hint"
     lazy-rules
     :rules="fieldRules"
+    :disable="disabled"
     clearable
     @focus="focusedSelection"
   />

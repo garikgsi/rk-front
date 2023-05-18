@@ -37,6 +37,11 @@ export default {
         return undefined;
       },
     },
+    disabled: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["update:modelValue"],
   computed: {

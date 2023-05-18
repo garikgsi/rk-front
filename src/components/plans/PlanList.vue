@@ -70,13 +70,22 @@ export default {
           mobile: "subTitle",
         },
         {
-          name: "created_at",
-          field: "created_at",
-          label: "Дата планирования",
+          name: "start_bill_date",
+          field: "start_bill_date",
+          label: "Дата начала учета",
           sortable: true,
           align: "left",
           type: "date",
-          mobile: "created_at",
+          mobile: "start_bill_date",
+        },
+        {
+          name: "kid_id",
+          field: "kid_id",
+          label: "Для учащегося",
+          sortable: true,
+          align: "right",
+          type: "kid",
+          mobile: "kid_id",
         },
       ];
       if (isAdmin.value) {
@@ -128,7 +137,8 @@ export default {
             id: row.id,
             title: row.title,
             amount: row.amount,
-            created_at: row.created_at,
+            start_bill_date: row.start_bill_date,
+            kid_id: row.kid_id,
           };
         });
 
