@@ -8,6 +8,8 @@
     lazy-rules
     :rules="fieldRules"
     clearable
+    :disable="disabled"
+    :readonly="readonly"
     @update:modelValue="updateDate"
   >
     <template v-slot:prepend>

@@ -8,6 +8,7 @@
     lazy-rules
     :rules="fieldRules"
     :disable="disabled"
+    :readonly="readonly"
     clearable
     @focus="focusedSelection"
   />

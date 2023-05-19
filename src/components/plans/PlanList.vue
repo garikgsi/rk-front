@@ -79,13 +79,12 @@ export default {
           mobile: "start_bill_date",
         },
         {
-          name: "kid_id",
-          field: "kid_id",
+          name: "kid_fio",
+          field: "kid_fio",
           label: "Для учащегося",
           sortable: true,
-          align: "right",
           type: "kid",
-          mobile: "kid_id",
+          mobile: "kid_fio",
         },
       ];
       if (isAdmin.value) {
@@ -138,7 +137,7 @@ export default {
             title: row.title,
             amount: row.amount,
             start_bill_date: row.start_bill_date,
-            kid_id: row.kid_id,
+            kid_fio: row.kid_fio,
           };
         });
 
