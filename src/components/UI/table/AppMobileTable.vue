@@ -130,7 +130,7 @@ import { ref, toRefs, computed } from "vue";
 import MobileTableRowVue from "@/components/UI/table/MobileTableRow.vue";
 import { fm } from "@/composition/math";
 export default {
-  name: "app-table",
+  name: "app-mobile-table",
   props: {
     items: {
       require: true,

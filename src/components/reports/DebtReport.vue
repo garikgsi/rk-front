@@ -2,23 +2,18 @@
   <organization-require
     title="Выберите учебное учреждение для которого показать отчет"
   >
-    <!-- <pre>{{ items }}</pre> -->
     <app-table
       v-if="isAdmin"
       :items="items"
       :columns="columns"
       :editable="false"
       :addable="false"
-      :totalRow="{
-        fio: 'ИТОГО:',
-        planSum: totals.planSum,
-        paySum: totals.paySum,
-        debt: totals.debt,
-      }"
-      :clickable="false"
+      :clickable="true"
       v-model:search="tableSearchString"
-      :pagination="pagination"
+      :pagination="tablePagination"
+      :total-row="totals"
       @update:pagination="updatePagination"
+      @row-click="showDetails"
     ></app-table>
     <div v-else>
       <h1>Просматривать отчет по долгам могут только администраторы</h1>
@@ -29,28 +24,53 @@
 <script>
 import AppTableVue from "../UI/table/AppTable.vue";
 
-import debtReport from "@/composition/debt/debtReport";
-import debtFilter from "@/composition/debt/debtFilter";
-import debtTotals from "@/composition/debt/debtTotals";
-import tablePagination from "@/composition/tablePagination";
 import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vue";
 import currentOrganization from "@/composition/organizations/currentOrganization";
+import currentPeriod from "@/composition/periods/currentPeriod";
+import debtReport from "@/composition/debt/debtReport";
 
-import { ref, computed } from "vue";
+import { ref, onMounted, watch } from "vue";
+import router from "@/router";
 export default {
   setup() {
-    const { debtData } = debtReport();
+    const { periodId } = currentPeriod();
+
+    const {
+      search,
+      formattedDebt,
+      fetchDebt,
+      tablePagination,
+      updatePagination,
+      total,
+    } = debtReport();
+
     // is user == admin of organizations
     const { isAdmin } = currentOrganization();
 
-    const { filteredData, tableSearchString } = debtFilter(debtData);
-
-    const tableData = computed(() => {
-      // return [...filteredData.value].filter((kid) => kid.debt < 0);
-      return filteredData.value;
+    onMounted(() => {
+      console.log("mounted debt report", periodId.value);
+      if (periodId.value) fetchData(periodId);
     });
 
-    const { totals } = debtTotals(filteredData);
+    const fetchData = async (periodId) => {
+      if (periodId.value) {
+        return await fetchDebt(periodId);
+      }
+      return null;
+    };
+
+    const showDetails = (event, row) => {
+      router.push({
+        path: "/debt_details",
+        query: { period_id: periodId.value, kid_id: row.id },
+      });
+      if (row.id) console.log("row clicked", row);
+    };
+
+    watch(periodId, () => {
+      // console.log("fetch debt report with new period", newPeriodId);
+      fetchData(periodId);
+    });
 
     const columns = ref([
       {
@@ -89,17 +109,15 @@ export default {
       },
     ]);
 
-    // table pagination from store
-    const { pagination, updatePagination } = tablePagination("debt");
-
     return {
-      items: tableData,
+      items: formattedDebt,
       columns,
-      tableSearchString,
-      pagination,
-      totals,
+      tableSearchString: search,
+      tablePagination,
+      totals: total,
       isAdmin,
       updatePagination,
+      showDetails,
     };
   },
   name: "debt-report",

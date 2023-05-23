@@ -8,10 +8,10 @@ export default function planRepository() {
   const { periodId } = currentPeriod();
 
   // all plan items for period
-  const planItems = computed(() => store.state.plans.all[periodId.value]);
+  const planItems = computed(() => store.state.plans.all?.[periodId.value]);
   // data loaded
   const plansLoaded = computed(
-    () => store.state.plans?.dataLoaded[periodId.value]
+    () => store.state.plans?.dataLoaded?.[periodId.value]
   );
 
   // sum plan amount

@@ -12,7 +12,10 @@ export default function periodRepository() {
   const { organizationId } = currentOrganization();
   // getters from store
   const periods = computed(() => {
-    if (organizationId.value && store.state.periods.all[organizationId.value]) {
+    if (
+      organizationId.value &&
+      store.state.periods.all?.[organizationId.value]
+    ) {
       return store.state.periods.all[organizationId.value].filter(
         (period) => period.organization_id == organizationId.value
       );
@@ -20,12 +23,12 @@ export default function periodRepository() {
     return [];
   });
   const currentPeriodId = computed(() => {
-    return store.state.periods.current[organizationId.value] || null;
+    return store.state.periods.current?.[organizationId.value] || null;
   });
   const currentPeriod = computed(() => {
     if (
       currentPeriodId.value &&
-      store.state.periods.all[organizationId.value]
+      store.state.periods.all?.[organizationId.value]
     ) {
       return store.state.periods.all[organizationId.value].find(
         (period) => period.id == currentPeriodId.value
@@ -41,7 +44,7 @@ export default function periodRepository() {
     //   }`
     // );
     return (
-      store.state.periods.dataLoaded[organizationId.value] === true || false
+      store.state.periods.dataLoaded?.[organizationId.value] === true || false
     );
   });
   const periodsCount = computed(() => periods.value.length);

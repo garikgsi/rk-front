@@ -8,7 +8,7 @@ import organizationsModule from "./modules/organizations";
 import plansModule from "./modules/plans";
 import operationsModule from "./modules/operations";
 import paymentsModule from "./modules/payments";
-import debtModule from "./modules/debt";
+// import debtModule from "./modules/debt";
 import publicModule from "./modules/public";
 import parentsModule from "./modules/parents";
 
@@ -20,7 +20,7 @@ export default createStore({
     plans: plansModule,
     operations: operationsModule,
     payments: paymentsModule,
-    debt: debtModule,
+    // debt: debtModule,
     public: publicModule,
     parents: parentsModule,
     organizations: organizationsModule,

@@ -6,9 +6,9 @@ export default {
   namespaced: true,
   // store
   state: {
-    all: {},
+    all: null,
     loading: false,
-    dataLoaded: {},
+    dataLoaded: null,
     expanded: {},
   },
   // getters
@@ -20,11 +20,18 @@ export default {
   // muattions
   mutations: {
     SET_DATA_LOADED(state, { organizationId, isLoaded }) {
-      // console.log(organizationId, isLoaded);
-      state.dataLoaded[organizationId] = isLoaded;
+      if (state.dataLoaded) {
+        state.dataLoaded[organizationId] = isLoaded;
+      } else {
+        state.dataLoaded = { [organizationId]: isLoaded };
+      }
     },
     SET_ALL(state, { organizationId, data }) {
-      state.all[organizationId] = data;
+      if (state.all) {
+        state.all[organizationId] = data;
+      } else {
+        state.all = { [organizationId]: data };
+      }
     },
 
     ADD(state, { data }) {
@@ -63,7 +70,6 @@ export default {
     // fetch data
     async getKids({ commit, getters, dispatch }, { params }) {
       // console.log(`getting kids for org=${getters.organizationId}`);
-      dispatch("setLoading", true);
       const response = await apiGet({ url: `kids`, params });
       dispatch("setLoading", false);
       if (!response.isError) {

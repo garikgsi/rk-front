@@ -7,9 +7,9 @@ export default {
   namespaced: true,
   // store
   state: {
-    all: {},
+    all: null,
     loading: false,
-    dataLoaded: {},
+    dataLoaded: null,
     tablePagination: {
       page: 1,
       sortBy: "date_payment",
@@ -26,7 +26,18 @@ export default {
   // muattions
   mutations: {
     SET_ALL(state, { periodId, data }) {
-      state.all[periodId] = data;
+      if (state.all === null) {
+        state.all = { [periodId]: data };
+      } else {
+        state.all[periodId] = data;
+      }
+    },
+    SET_DATA_LOADED(state, { isLoaded, periodId }) {
+      if (state.dataLoaded === null) {
+        state.dataLoaded = { [periodId]: isLoaded };
+      } else {
+        state.dataLoaded[periodId] = isLoaded;
+      }
     },
     ADD(state, { data }) {
       if (state.all[data.period_id]) {
@@ -59,9 +70,6 @@ export default {
     SET_LOADING(state, isLoading) {
       state.loading = isLoading;
     },
-    SET_DATA_LOADED(state, { isLoaded, periodId }) {
-      state.dataLoaded[periodId] = isLoaded;
-    },
     REMOVE(state, { id, periodId }) {
       const removedItem = state.all[periodId].findIndex((row) => row.id === id);
       if (removedItem !== -1) state.all[periodId].splice(removedItem, 1);
@@ -79,21 +87,23 @@ export default {
     },
     // fetch data
     async getPayments({ commit, getters, dispatch }, { params }) {
+      const periodId = await getters.periodId;
+
       dispatch("setLoading", true);
       commit("SET_DATA_LOADED", {
         isLoaded: false,
-        periodId: getters.periodId,
+        periodId: periodId,
       });
       const response = await apiGet({ url: `payments`, params });
       dispatch("setLoading", false);
       if (!response.isError) {
         commit("SET_ALL", {
           data: response.data,
-          periodId: getters.periodId,
+          periodId: periodId,
         });
         commit("SET_DATA_LOADED", {
           isLoaded: true,
-          periodId: getters.periodId,
+          periodId: periodId,
         });
       }
       return response;

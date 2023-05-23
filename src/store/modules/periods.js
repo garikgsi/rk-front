@@ -5,10 +5,10 @@ export default {
   namespaced: true,
   // store
   state: {
-    all: {},
+    all: null,
     current: {},
     loading: false,
-    dataLoaded: {},
+    dataLoaded: null,
   },
   // getters
   getters: {
@@ -29,10 +29,19 @@ export default {
       if (lastPeriod) state.current[organizationId] = lastPeriod.id;
     },
     SET_DATA_LOADED(state, { isLoaded, organizationId }) {
-      state.dataLoaded[organizationId] = isLoaded;
+      if (state.dataLoaded === null) {
+        state.dataLoaded = { [organizationId]: isLoaded };
+      } else {
+        state.dataLoaded[organizationId] = isLoaded;
+      }
     },
     SET_ALL(state, { organizationId, data }) {
-      state.all[organizationId] = data;
+      if (state.all === null) {
+        console.log("organizationId, data", organizationId, data);
+        state.all = { [organizationId]: data };
+      } else {
+        state.all[organizationId] = data;
+      }
     },
 
     ADD_PERIOD(state, { data }) {
@@ -94,27 +103,28 @@ export default {
       return response;
     },
     // get periods
-    async getPeriods({ commit, getters, dispatch }, { params }) {
-      dispatch("setLoading", true);
+    async getPeriods({ commit, getters }, { params }) {
+      const organizationId = await getters.organizationId;
+      // dispatch("setLoading", true);
       commit("SET_DATA_LOADED", {
         isLoaded: false,
-        organizationId: getters.organizationId,
+        organizationId: organizationId,
       });
 
       const response = await apiGet({ url: `periods`, params });
-      dispatch("setLoading", false);
+      // dispatch("setLoading", false);
 
       if (!response.isError) {
         commit("SET_ALL", {
-          organizationId: getters.organizationId,
+          organizationId: organizationId,
           data: response.data,
         });
         if (!getters.current) {
-          commit("SET_LAST_PERIOD", getters.organizationId);
+          commit("SET_LAST_PERIOD", organizationId);
         }
         commit("SET_DATA_LOADED", {
           isLoaded: true,
-          organizationId: getters.organizationId,
+          organizationId: organizationId,
         });
       }
       return response;

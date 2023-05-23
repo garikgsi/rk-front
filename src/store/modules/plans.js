@@ -7,9 +7,9 @@ export default {
   namespaced: true,
   // store
   state: {
-    all: {},
+    all: null,
     loading: false,
-    dataLoaded: {},
+    dataLoaded: null,
     tablePagination: {
       page: 1,
       sortBy: "created_at",
@@ -26,10 +26,18 @@ export default {
   // muattions
   mutations: {
     SET_ALL(state, { periodId, data }) {
-      state.all[periodId] = data;
+      if (state.all === null) {
+        state.all = { [periodId]: data };
+      } else {
+        state.all[periodId] = data;
+      }
     },
     SET_DATA_LOADED(state, { isLoaded, periodId }) {
-      state.dataLoaded[periodId] = isLoaded;
+      if (state.dataLoaded === null) {
+        state.dataLoaded = { [periodId]: isLoaded };
+      } else {
+        state.dataLoaded[periodId] = isLoaded;
+      }
     },
     ADD(state, { data }) {
       if (state.all[data.period_id]) {

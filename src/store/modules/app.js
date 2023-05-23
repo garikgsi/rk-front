@@ -14,9 +14,10 @@ export default {
   },
   // actions
   actions: {
-    // set pagination for table
-    setLoading({ commit }, isLoading) {
-      commit("SET_LOADING", isLoading);
+    // set loading
+    setLoading(/*{ commit }, isLoading*/) {
+      console.log("set loading");
+      // commit("SET_LOADING", isLoading);
     },
   },
 };

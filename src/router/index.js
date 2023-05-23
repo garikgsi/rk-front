@@ -24,6 +24,7 @@ import PublicViewVue from "@/views/PublicView.vue";
 import OrganizationEditorViewVue from "@/views/organizations/OrganizationEditorView.vue";
 import OrganizationViewVue from "@/views/organizations/OrganizationView.vue";
 import InviteRegisterVue from "@/views/InviteRegister.vue";
+import DebtKidView from "@/views/reports/DebtKidView.vue";
 
 const routes = [
   {
@@ -133,6 +134,15 @@ const routes = [
     path: "/debt",
     name: "debt",
     component: DebtViewVue,
+  },
+  {
+    path: "/debt_details",
+    name: "debt-details",
+    component: DebtKidView,
+    props: (route) => ({
+      kidId: route.query.kid_id,
+      periodId: route.query.period_id,
+    }),
   },
   {
     path: "/organization-form/:id?",

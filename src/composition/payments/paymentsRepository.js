@@ -14,13 +14,13 @@ export default function operationRepository() {
 
   // data loaded for period
   const dataLoaded = computed(
-    () => store.state.payments?.dataLoaded[periodId.value] || false
+    () => store.state.payments?.dataLoaded?.[periodId.value] || false
   );
 
   // all operations items for period
   const paymentsItems = computed(() => {
     if (periodId.value && dataLoaded.value) {
-      return [...store.state.payments.all[periodId.value]].map((payment) => {
+      return [...store.state.payments.all?.[periodId.value]].map((payment) => {
         let modPayment = { ...payment };
         if (payment.kid_id) {
           const kid = getKidById(payment.kid_id);
@@ -60,6 +60,7 @@ export default function operationRepository() {
 
   // fetch data for period
   const fetchPaymentsData = (params = {}) => {
+    console.log("fetchPaymentsData", defaultParams.value);
     if (!dataLoaded.value && periodId?.value) {
       store.dispatch("payments/getPayments", {
         params: { ...defaultParams.value, ...params },

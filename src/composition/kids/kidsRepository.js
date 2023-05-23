@@ -12,26 +12,27 @@ export default function kidsRepository() {
 
   // data loaded for organization
   const kidsLoaded = computed(() => {
-    try {
-      return store.state.kids.dataLoaded[organizationId.value] || false;
-    } catch (error) {
-      return false;
+    if (organizationId.value && period.value) {
+      return store.state.kids.dataLoaded?.[organizationId.value];
     }
+    return false;
   });
 
   const storeItems = computed(() => {
-    const data = store.state.kids.all[organizationId.value];
-    if (data) {
-      return [...data].filter((kid) => {
-        return (
-          (kid.start_study === null && kid.end_study === null) ||
-          (kid.start_study !== null &&
-            moment(kid.start_study) > moment(period.value.start_date) &&
-            moment(kid.start_study) < moment(period.value.end_date)) ||
-          (kid.end_study !== null &&
-            moment(kid.end_study) > moment(period.value.start_date))
-        );
-      });
+    if (organizationId.value && period.value) {
+      const data = store.state.kids.all?.[organizationId.value];
+      if (data) {
+        return [...data].filter((kid) => {
+          return (
+            (kid.start_study === null && kid.end_study === null) ||
+            (kid.start_study !== null &&
+              moment(kid.start_study) > moment(period.value.start_date) &&
+              moment(kid.start_study) < moment(period.value.end_date)) ||
+            (kid.end_study !== null &&
+              moment(kid.end_study) > moment(period.value.start_date))
+          );
+        });
+      }
     }
     return [];
   });

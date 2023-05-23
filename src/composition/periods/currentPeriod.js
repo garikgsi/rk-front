@@ -8,7 +8,7 @@ export default function currentPeriod() {
   );
   const period = computed(() => {
     try {
-      return store.state.periods.all[store.state.organizations.current].find(
+      return store.state.periods.all?.[store.state.organizations.current].find(
         (period) => period.id == periodId.value
       );
     } catch (error) {

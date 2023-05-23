@@ -9,11 +9,11 @@ export default function operationRepository() {
 
   // all operations items for period
   const operationItems = computed(() =>
-    periodId.value ? store.state.operations.all[periodId.value] : []
+    periodId.value ? store.state.operations.all?.[periodId.value] : []
   );
   // data loaded for period
   const operationsLoaded = computed(
-    () => store.state.operations?.dataLoaded[periodId.value] || false
+    () => store.state.operations?.dataLoaded?.[periodId.value] || false
   );
 
   // fetch data params
