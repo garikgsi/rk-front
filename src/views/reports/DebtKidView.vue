@@ -99,7 +99,6 @@ const paymentColumns = computed(() => {
     },
   ];
 });
-
 </script>
 
 <template>
@@ -173,11 +172,10 @@ const paymentColumns = computed(() => {
           class="q-px-sm"
           :class="[colorClass(report.debt)]"
           v-if="report.debt !== 0"
-        >{{ report.debt < 0 ? "долг" : "переплата" }}
-          {{ fm(Math.abs(report.debt)) }}</span>
-        <span v-else class="text-green">
-          все отлично)
-        </span>
+          >{{ report.debt < 0 ? "долг" : "переплата" }}
+          {{ fm(Math.abs(report.debt)) }}</span
+        >
+        <span v-else class="text-green"> все отлично) </span>
       </div>
     </q-card-section>
     <q-card-section v-else>
