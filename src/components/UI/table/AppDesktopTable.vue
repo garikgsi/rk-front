@@ -21,12 +21,19 @@
       <div class="col-sm-7" v-if="title">
         <div class="text-h5 text-primary">{{ title }}</div>
       </div>
-      <div :class="title ? 'col-sm-12' : 'col-sm-7'" v-if="searchable">
-        <!-- search line -->
-        <table-search
-          :modelValue="search"
-          @update:modelValue="searchUpdated($event)"
-        ></table-search>
+      <div :class="title ? 'col-sm-12' : 'col-sm-7'">
+        <div class="row">
+          <div class="col" v-if="searchable">
+            <!-- search line -->
+            <table-search
+              :modelValue="search"
+              @update:modelValue="searchUpdated($event)"
+            ></table-search>
+          </div>
+          <div class="col q-mx-sm">
+            <slot name="top-append"></slot>
+          </div>
+        </div>
       </div>
     </template>
 

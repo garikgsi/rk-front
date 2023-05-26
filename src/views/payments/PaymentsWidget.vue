@@ -12,8 +12,8 @@
       </div>
       <div>
         Сумма задолженности:
-        <span :class="sumDebt.debt < 0 ? 'text-negative' : 'text-positive'"
-          >{{ sumDebt.debt }} руб.</span
+        <span :class="debtTotal.debt < 0 ? 'text-negative' : 'text-positive'"
+          >{{ debtTotal.debt }} руб.</span
         >
       </div>
     </div>
@@ -27,7 +27,8 @@ import paymentsRepository from "@/composition/payments/paymentsRepository";
 import { onMounted, computed, ref } from "vue";
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import currentPeriod from "@/composition/periods/currentPeriod";
-import debtTotals from "@/composition/debt/debtTotals";
+// import debtTotals from "@/composition/debt/debtTotals";
+import debtReport from "@/composition/debt/debtReport";
 
 // import currentPeriod from "@/composition/periods/currentPeriod";
 
@@ -37,16 +38,21 @@ export default {
     const { fetchPaymentsData, sumPayments } = paymentsRepository();
     // const { fetchPlansData } = planRepository();
     // debts
-    const { sumDebt } = debtTotals();
+    // const { sumDebt } = debtTotals();
     // admin permissions
     const { isAdmin } = currentOrganization();
     // widget color
     const color = ref("pink");
     // current period
     const { period } = currentPeriod();
+
+    const periodId = computed(() => period.value.id);
     // mounted hook - load payments data
+    const { fetchDebt, total: debtTotal } = debtReport(periodId);
+
     onMounted(() => {
       fetchPaymentsData();
+      fetchDebt();
       // fetchPlansData();
     });
 
@@ -71,9 +77,10 @@ export default {
     return {
       sumPayments,
       buttons,
-      sumDebt,
+      // sumDebt,
       isAdmin,
       color,
+      debtTotal,
     };
   },
   components: {

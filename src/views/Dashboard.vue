@@ -53,7 +53,7 @@ import kidsRepository from "@/composition/kids/kidsRepository";
 import { computed, onMounted } from "vue";
 
 import OperationsWidgetVue from "./operations/OperationsWidget.vue";
-// import PaymentsWidgetVue from "./payments/PaymentsWidget.vue";
+import PaymentsWidgetVue from "./payments/PaymentsWidget.vue";
 import PeriodsWidgetVue from "./periods/PeriodsWidget.vue";
 import PlansWidgetVue from "./plans/PlansWidget.vue";
 import KidsWidgetVue from "@/views/kids/KidsWidger.vue";
@@ -72,7 +72,7 @@ export default {
         OrganizationWidgetVue,
         PlansWidgetVue,
         OperationsWidgetVue,
-        // PaymentsWidgetVue,
+        PaymentsWidgetVue,
         KidsWidgetVue,
       ];
       if (isAdmin.value) {

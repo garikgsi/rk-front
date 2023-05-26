@@ -19,6 +19,9 @@ export default {
   getters: {},
   // muattions
   mutations: {
+    SET_LOADING(state, isLoading) {
+      state.loading = isLoading;
+    },
     SET_DEBT(state, { periodId, data }) {
       state.debt[periodId] = data;
     },
@@ -39,7 +42,7 @@ export default {
   actions: {
     // loading action
     setLoading({ commit }, isLoading) {
-      // commit("app/SET_LOADING", isLoading, { root: true });
+      commit("app/SET_LOADING", isLoading, { root: true });
       commit("SET_LOADING", isLoading);
     },
 

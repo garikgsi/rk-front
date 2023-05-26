@@ -1,11 +1,13 @@
 <script setup>
 import { onMounted, toRef, computed } from "vue";
 import useDebtKidReport from "@/composition/debt/debtKidReport";
-import router from "vue-router";
+import { useRouter } from "vue-router";
 import { fm } from "../../composition/math";
 import { dateUserFormat } from "../../composition/dates";
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import AppTable from "@/components/UI/table/AppTable.vue";
+import FormButtons from "@/components/UI/form/FormButtons.vue";
+import AppPage from "../AppSkeleton/AppPage.vue";
 
 const props = defineProps({
   kidId: {
@@ -19,6 +21,7 @@ const props = defineProps({
 });
 const kidId = toRef(props, "kidId");
 const periodId = toRef(props, "periodId");
+const router = useRouter();
 
 const { fetchReport, report } = useDebtKidReport(kidId);
 
@@ -99,94 +102,115 @@ const paymentColumns = computed(() => {
     },
   ];
 });
+
+const pageTitle = computed(() =>
+  report.value?.fio ? `Отчет ${report.value.fio}` : "Загружаем отчет"
+);
+const pageSubTitle = computed(() =>
+  report.value?.period?.name
+    ? `за период ${report.value.period.name}`
+    : "пожалуйста подождите..."
+);
 </script>
 
 <template>
-  <q-card class="q-mb-md" flat bordered v-if="report">
-    <q-card-section v-if="isAdmin">
-      <div class="text-h4 q-mt-sm q-mb-xs">
-        {{ report.fio }}
-        <span
-          class="q-px-sm"
-          :class="[colorClass(report.debt)]"
-          v-if="report.debt !== 0"
-          >! {{ report.debt < 0 ? "долг" : "переплата" }}
-          {{ fm(Math.abs(report.debt)) }} !</span
-        >
-      </div>
-      <div class="text-subtitle2 q-my-md">
-        <div class="q-py-sm" v-if="report.start_study || report.end_study">
-          <span v-if="report.start_study" class="q-pr-md"
-            >Начало обучения:
-            <span class="text-accent">{{
-              dateUserFormat(report.start_study)
-            }}</span></span
-          >
-          <span v-if="report.end_study"
-            >Окончание обучения:
-            <span class="text-accent">{{
-              dateUserFormat(report.end_study)
-            }}</span></span
+  <app-page
+    :title="pageTitle"
+    :subTitle="pageSubTitle"
+    icon="money_off"
+    :show-period-selector="false"
+  >
+    <q-card class="q-mb-md" flat bordered v-if="report">
+      <q-card-section v-if="isAdmin">
+        <div class="text-h4 q-mt-sm q-mb-xs">
+          {{ report.fio }}
+          <span
+            class="q-px-sm"
+            :class="[colorClass(report.debt)]"
+            v-if="report.debt !== 0"
+            >! {{ report.debt < 0 ? "долг" : "переплата" }}
+            {{ fm(Math.abs(report.debt)) }} руб. !</span
           >
         </div>
-        <div class="q-py-sm">
-          Детализация отчета за период:
-          <span class="text-primary">{{ report.period.name }}</span>
+        <div class="text-subtitle2 q-my-md">
+          <div class="q-py-sm" v-if="report.start_study || report.end_study">
+            <span v-if="report.start_study" class="q-pr-md"
+              >Начало обучения:
+              <span class="text-accent">{{
+                dateUserFormat(report.start_study)
+              }}</span></span
+            >
+            <span v-if="report.end_study"
+              >Окончание обучения:
+              <span class="text-accent">{{
+                dateUserFormat(report.end_study)
+              }}</span></span
+            >
+          </div>
+          <div class="q-py-sm">
+            Детализация отчета за период:
+            <span class="text-primary">{{ report.period.name }}</span>
+          </div>
         </div>
-      </div>
-      <q-separator></q-separator>
-      <div
-        class="text-h6"
-        :class="[colorClass(report.start_saldo, true)]"
-        v-if="report.start_saldo !== 0"
-      >
-        Долг на начало периода: {{ fm(report.start_saldo) }}
-      </div>
-      <div class="text-green text-h6 q-mt-lg">
-        Всего начислено за период: {{ fm(report.sumPlan) }}
-      </div>
-      <app-table
-        :columns="planColumns"
-        :items="report.plans"
-        :editable="false"
-        :addable="false"
-        :clickable="false"
-        :searchable="false"
-        :hide-pagination="true"
-      ></app-table>
-      <div class="text-h6 q-mt-lg" :class="[colorClass(report.debt)]">
-        Всего оплачено за период: {{ fm(report.sumPay) }}
-      </div>
-      <app-table
-        :columns="paymentColumns"
-        :items="report.payments"
-        :editable="false"
-        :addable="false"
-        :clickable="false"
-        :searchable="false"
-        :hide-pagination="true"
-      ></app-table>
-      <div class="text-h6 q-mt-lg">
-        Итого за период:
-        <span
-          class="q-px-sm"
-          :class="[colorClass(report.debt)]"
-          v-if="report.debt !== 0"
-          >{{ report.debt < 0 ? "долг" : "переплата" }}
-          {{ fm(Math.abs(report.debt)) }}</span
+        <q-separator></q-separator>
+        <div
+          class="text-h6"
+          :class="[colorClass(report.start_saldo, true)]"
+          v-if="report.start_saldo !== 0"
         >
-        <span v-else class="text-green"> все отлично) </span>
+          Долг на начало периода: {{ fm(report.start_saldo) }} руб.
+        </div>
+        <div class="text-green text-h6 q-mt-lg">
+          Всего начислено за период: {{ fm(report.sumPlan) }} руб.
+        </div>
+        <app-table
+          :columns="planColumns"
+          :items="report.plans"
+          :editable="false"
+          :addable="false"
+          :clickable="false"
+          :searchable="false"
+          :hide-pagination="true"
+        ></app-table>
+        <div class="text-h6 q-mt-lg" :class="[colorClass(report.debt)]">
+          Всего оплачено за период: {{ fm(report.sumPay) }} руб.
+        </div>
+        <app-table
+          :columns="paymentColumns"
+          :items="report.payments"
+          :editable="false"
+          :addable="false"
+          :clickable="false"
+          :searchable="false"
+          :hide-pagination="true"
+        ></app-table>
+        <div class="text-h6 q-mt-lg">
+          Итого за период:
+          <span
+            class="q-px-sm"
+            :class="[colorClass(report.debt)]"
+            v-if="report.debt !== 0"
+            >{{ report.debt < 0 ? "долг" : "переплата" }}
+            {{ fm(Math.abs(report.debt)) }} руб.</span
+          >
+          <span v-else class="text-green"> все отлично) </span>
+        </div>
+      </q-card-section>
+      <q-card-section v-else>
+        <h1>Просматривать отчет могут только администраторы</h1>
+      </q-card-section>
+    </q-card>
+    <div class="row" v-else>
+      <div class="col">
+        <q-spinner color="primary" size="3em"></q-spinner>
       </div>
-    </q-card-section>
-    <q-card-section v-else>
-      <h1>Просматривать отчет могут только администраторы</h1>
-    </q-card-section>
-  </q-card>
-  <form-buttons
-    @close="closeForm"
-    :cancelable="false"
-    :saveable="false"
-  ></form-buttons>
+    </div>
+    <form-buttons
+      @close="closeForm"
+      :cancelable="false"
+      :saveable="false"
+    ></form-buttons>
+  </app-page>
 </template>
 
 <style lang="scss" scoped></style>

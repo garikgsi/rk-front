@@ -10,11 +10,13 @@
       :addable="false"
       :clickable="true"
       v-model:search="tableSearchString"
-      :pagination="tablePagination"
+      :pagination="pagination"
       :total-row="totals"
+      :exportable="debtLoaded"
       @update:pagination="updatePagination"
       @row-click="showDetails"
-    ></app-table>
+    >
+    </app-table>
     <div v-else>
       <h1>Просматривать отчет по долгам могут только администраторы</h1>
     </div>
@@ -28,6 +30,7 @@ import OrganizationRequeryVue from "@/views/organizations/OrganizationRequery.vu
 import currentOrganization from "@/composition/organizations/currentOrganization";
 import currentPeriod from "@/composition/periods/currentPeriod";
 import debtReport from "@/composition/debt/debtReport";
+import tablePagination from "@/composition/tablePagination";
 
 import { ref, onMounted, watch } from "vue";
 import router from "@/router";
@@ -35,24 +38,20 @@ export default {
   setup() {
     const { periodId } = currentPeriod();
 
-    const {
-      search,
-      formattedDebt,
-      fetchDebt,
-      tablePagination,
-      updatePagination,
-      total,
-    } = debtReport();
+    const { search, formattedDebt, fetchDebt, total, debtLoaded } =
+      debtReport(periodId);
+
+    const { pagination, updatePagination } = tablePagination("debt");
 
     // is user == admin of organizations
     const { isAdmin } = currentOrganization();
 
     onMounted(() => {
       console.log("mounted debt report", periodId.value);
-      if (periodId.value) fetchData(periodId);
+      if (periodId.value && !debtLoaded.value) fetchData();
     });
 
-    const fetchData = async (periodId) => {
+    const fetchData = async () => {
       if (periodId.value) {
         return await fetchDebt(periodId);
       }
@@ -64,12 +63,11 @@ export default {
         path: "/debt_details",
         query: { period_id: periodId.value, kid_id: row.id },
       });
-      if (row.id) console.log("row clicked", row);
     };
 
     watch(periodId, () => {
       // console.log("fetch debt report with new period", newPeriodId);
-      fetchData(periodId);
+      fetchData();
     });
 
     const columns = ref([
@@ -113,11 +111,12 @@ export default {
       items: formattedDebt,
       columns,
       tableSearchString: search,
-      tablePagination,
+      pagination,
       totals: total,
       isAdmin,
       updatePagination,
       showDetails,
+      debtLoaded,
     };
   },
   name: "debt-report",

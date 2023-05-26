@@ -1,22 +1,36 @@
 import { computed, ref } from "vue";
-import { apiGet } from "@/composition/requestApi";
+// import { apiGet } from "@/composition/requestApi";
 import { fm } from "@/composition/math";
+import { useStore } from "vuex";
 
-export default function debtReport() {
-  const debtLoaded = ref(false);
-  const debt = ref([]);
+export default function debtReport(periodId) {
+  const store = useStore();
+  // const debtLoaded = ref(false);
+  // const debt = ref([]);
   const search = ref("");
 
-  const tablePagination = ref({
-    page: 1,
-    sortBy: "debt",
-    descending: false,
-    rowsPerPage: 20,
-  });
+  const debt = computed(() => store.state.debt.debt?.[periodId.value] || []);
+  const debtLoaded = computed(
+    () => store.state.debt.debtLoaded?.[periodId.value] || false
+  );
 
-  const updatePagination = (pagination) => {
-    tablePagination.value = pagination;
-  };
+  // store.dispatch("operations/getOperations", {
+  //   params: { ...defaultParams.value, ...params },
+  // });
+  // const operationsLoaded = computed(
+  //   () => store.state.operations?.dataLoaded?.[periodId.value] || false
+  // );
+
+  // const tablePagination = ref({
+  //   page: 1,
+  //   sortBy: "debt",
+  //   descending: false,
+  //   rowsPerPage: 20,
+  // });
+
+  // const updatePagination = (pagination) => {
+  //   tablePagination.value = pagination;
+  // };
 
   const filteredItems = computed(() => {
     if (search.value && !!debt.value) {
@@ -29,13 +43,16 @@ export default function debtReport() {
     return debt.value;
   });
 
-  const fetchDebt = async (periodId) => {
-    const response = await apiGet({ url: `debt/${periodId.value}` });
-    if (!response.isError) {
-      debtLoaded.value = true;
-      debt.value = response.data;
-    }
-    return response;
+  const fetchDebt = async () => {
+    return store.dispatch("debt/getDebtReport", {
+      params: { periodId: periodId.value },
+    });
+    // const response = await apiGet({ url: `debt/${periodId.value}` });
+    // if (!response.isError) {
+    //   debtLoaded.value = true;
+    //   debt.value = response.data;
+    // }
+    // return response;
   };
 
   const formattedDebt = computed(() => {
@@ -68,8 +85,8 @@ export default function debtReport() {
     filteredItems,
     formattedDebt,
     fetchDebt,
-    tablePagination,
-    updatePagination,
+    // tablePagination,
+    // updatePagination,
     total,
   };
 }

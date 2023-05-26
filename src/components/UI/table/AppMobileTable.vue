@@ -20,11 +20,18 @@
           </div>
           <div :class="title || !addable ? 'col-12' : 'col-9'">
             <!-- search line -->
-            <table-search
-              v-if="searchable"
-              :modelValue="search"
-              @update:modelValue="searchUpdated($event)"
-            ></table-search>
+            <div class="row">
+              <div class="col col-9">
+                <table-search
+                  v-if="searchable"
+                  :modelValue="search"
+                  @update:modelValue="searchUpdated($event)"
+                ></table-search>
+              </div>
+              <div class="col-3 q-px-sm">
+                <slot name="top-append"></slot>
+              </div>
+            </div>
           </div>
         </div>
       </div>

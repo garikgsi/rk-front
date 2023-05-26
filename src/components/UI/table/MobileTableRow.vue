@@ -12,7 +12,7 @@
           <span
             v-if="col.type == 'money'"
             :class="{
-              'text-negotive': parseFloat(item[col.name]) < 0,
+              'text-negative': parseFloat(item[col.name]) < 0,
             }"
             >{{ item[col.name] }} руб.</span
           >

@@ -23,6 +23,14 @@
     <template v-slot:actions="{ row }">
       <slot name="actions" :row="row"></slot>
     </template>
+    <template v-slot:top-append>
+      <q-btn
+        v-if="exportable"
+        color="positive"
+        icon="file_download"
+        @click="exportCsv"
+      />
+    </template>
   </component>
 </template>
 
@@ -31,6 +39,9 @@ import screen from "@/composition/screen";
 import AppDesktopTableVue from "./AppDesktopTable.vue";
 import AppMobileTableVue from "./AppMobileTable.vue";
 import { toRef, computed } from "vue";
+import { exportFile } from "quasar";
+import { addError } from "@/composition/addMessage";
+// import unicodeToWin1251 from "utf8-to-win1251";
 
 export default {
   name: "app-table",
@@ -98,6 +109,11 @@ export default {
       type: String,
       default: null,
     },
+    exportable: {
+      require: false,
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     "row-click",
@@ -112,6 +128,8 @@ export default {
     const { isPhone } = screen();
 
     const view = toRef(props);
+    const columns = toRef(props, "columns");
+    const items = toRef(props, "items");
 
     const componentName = computed(() => {
       let component = isPhone.value ? "app-mobile-table" : "app-desktop-table";
@@ -132,9 +150,61 @@ export default {
       return component;
     });
 
+    const wrapCsvValue = (val, formatFn, row) => {
+      const winVal = val;
+      let formatted = formatFn !== void 0 ? formatFn(winVal, row) : winVal;
+
+      formatted =
+        formatted === void 0 || formatted === null ? "" : String(formatted);
+
+      formatted = formatted
+        .split('"')
+        .join('""')
+        .split("\n")
+        .join("\\n")
+        .split("\r")
+        .join("\\r");
+
+      return `"${formatted}"`;
+    };
+
+    const exportCsv = () => {
+      const content = [
+        columns.value.map((col) => wrapCsvValue(col.label)).join(";"),
+      ]
+        .concat(
+          items.value.map((row) =>
+            columns.value
+              .map((col) =>
+                wrapCsvValue(
+                  typeof col.field === "function"
+                    ? col.field(row)
+                    : row[col.field === void 0 ? col.name : col.field],
+                  col.format,
+                  row
+                )
+              )
+              .join(";")
+          )
+        )
+        .join("\r\n");
+
+      const status = exportFile("table-export.csv", content, {
+        // encoding: "windows-1252",
+        // mimeType: "text/csv;charset=windows-1252;",
+        encoding: "utf-8",
+        mimeType: "text/csv;charset=utf-8;",
+      });
+
+      if (status !== true) {
+        addError("Браузер не поддерживает загрузку файла");
+      }
+    };
+
     return {
       isPhone,
       componentName,
+      exportCsv,
     };
   },
   components: {
